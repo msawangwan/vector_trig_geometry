@@ -32,21 +32,18 @@ public class FollowOther : MonoBehaviour {
 
 		startpoint = transform.position;
 		endpoint = Camera.main.ScreenToWorldPoint ( new Vector3 ( Input.mousePosition.x, Input.mousePosition.y, 10.0f ) );
+		PaintRay2DAxisX();
 	}
 
 	bool CalculateInterpolation ( Transform self, Vector3 start, Vector3 end, float t ) {
 
-		PaintRay2D ();
+		PaintRay2DHeading ();
 
 		float percent = ExpStepf ( TimeStepf ( t ) );
 		self.position = Vector3.Lerp ( start, end, percent );
 
 		if ( percent >= 1.0f ) return true;
 		else return false;
-	}
-
-	Vector3 TurnTo ( Vector3 a, Vector3 b ) {
-		float theta = Mathf.Atan2 ( a.)
 	}
 
 	/* t = currentLerpTime / lerpTime */
@@ -73,14 +70,14 @@ public class FollowOther : MonoBehaviour {
 
 	/* d = sqrt ( (x2-x1) + (y2-y1) ) = magnitude */
 	float Distancef ( Vector3 a, Vector3 b ) {
-		return Mathf.Sqrt( ( ( b.x - a.x ) * ( b.x - a.x ) ) + ( ( b.y - a.y ) * ( b.y - a.y ) ) );
+		return Mathf.Sqrt ( ( ( b.x - a.x ) * ( b.x - a.x ) ) + ( ( b.y - a.y ) * ( b.y - a.y ) ) );
 	}
 
-	float Magnitudef ( Vector3 a, Vector3 b, float z ) {
-		return new Vector3( ( b.x - a.x ) * ( b.x - a.x ) ), ( ( b.y - a.y ) * ( b.y - a.y ), 2.0f );
-	}
-
-	void PaintRay2D () {
+	void PaintRay2DHeading () {
 		Debug.DrawRay ( transform.position, transform.up * 3.0f, Color.yellow, 0.2f, false );
+	}
+	
+	void PaintRay2DAxisX () {
+		Debug.DrawRay ( transform.position, transform.right * 10.0f, Color.yellow, 5.0f, false );
 	}
 }
