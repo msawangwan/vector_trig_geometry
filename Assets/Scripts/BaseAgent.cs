@@ -13,7 +13,7 @@ public class BaseAgent : MonoBehaviour {
             float angle = 0f;
 
             if ( heading.y < 0 ) {
-                angle = theta + 270f;
+                angle = 270f - theta;
             } else {
                 angle = theta - 90f;
             }
