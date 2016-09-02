@@ -2,11 +2,6 @@
 
 public static class VectorExtension {
 
-    /* forumla for calculating a seeking force */
-    public static Vector3 DesiredVelocity (this Vector3 a, Vector3 b, Vector3 velocity, float maxSpeed) {
-        return ( ( b - a ).normalized * maxSpeed ) - velocity;
-    }
-
     /* if vector a is greater than maxLength, scale a by max length else return a */
     public static Vector3 Truncate (this Vector3 a, float maxLength) {
         if ( a.Lengthf () > maxLength ) return a.normalized * maxLength;
