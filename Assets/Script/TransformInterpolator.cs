@@ -1,4 +1,4 @@
-﻿#define DEBUG
+﻿//#define DEBUG
 
 using UnityEngine;
 
@@ -6,11 +6,15 @@ using UnityEngine;
 /// Attach as a component to a GameObject and, from another script on the object 
 /// run the Interpolate method in the update method.
 /// <summary>
-public class TransformInterpolator : MonoBehaviour {
+public class TransformInterpolator : MonoBehaviour
+{
 
-    bool isInterpolating = true;
-    bool isLerping = false;
-    bool isSlerping = false;
+    public bool isInterpolating { get; set; }
+    public bool isLerpEnabled { get; set; }
+    public bool isSlerpEnabled { get; set; }
+    public bool SentStartSig { get; set; }
+    public bool isLerping { get; set; }
+    public bool isSlerping { get; set; }
 
     float tLerp = 0f;
     float tSlerp = 0f;
@@ -22,14 +26,15 @@ public class TransformInterpolator : MonoBehaviour {
     Quaternion targetRot = Quaternion.identity;
 
     /* Call in update.  */
-    public void Interpolate() {
+    public void Interpolate(Vector3 to) {
 
         if (isInterpolating) {
 
-            if (Input.GetMouseButtonDown(0)) {
-                tLerp = StartLerp(gameObject.transform, MousePointer.Pos());
-                tSlerp = StartSlerp(gameObject.transform, MousePointer.Pos());
-            }
+            //if (SentStartSig) {
+            //    if (isLerpEnabled) tLerp = StartLerp(gameObject.transform, to);
+            //    if (isSlerpEnabled) tSlerp = StartSlerp(gameObject.transform, to);
+            //    SentStartSig = false;
+            //}
 
             if (isLerping) {
                 if (LerpToTargetPos(gameObject.transform, initialPos, targetPos, tLerp)) {
@@ -45,7 +50,22 @@ public class TransformInterpolator : MonoBehaviour {
         }
     }
 
-	float StartLerp (Transform start, Vector3 end) {
+    public void LerpOnly () {
+        isLerpEnabled = true;
+        isSlerpEnabled = false;
+    }
+
+    public void SlerpOnly () {
+        isLerpEnabled = false;
+        isSlerpEnabled = true;
+    }
+
+    public void LerpWithLerp () {
+        isLerpEnabled = true;
+        isSlerpEnabled = true;
+    }
+
+	public float StartLerp (Transform start, Vector3 end) {
 		isLerping = true;
 
         initialPos = start.position;
@@ -71,7 +91,7 @@ public class TransformInterpolator : MonoBehaviour {
         return Time.time;
     }
 
-    bool LerpToTargetPos(Transform self, Vector3 start, Vector3 end, float t) {
+    public bool LerpToTargetPos(Transform self, Vector3 start, Vector3 end, float t) {
 
         float percent = ExpStepf(LinearStepf(t));
         self.position = Vector3.Lerp(start, end, percent);
@@ -100,7 +120,7 @@ public class TransformInterpolator : MonoBehaviour {
     }
 
     /* t = currentLerpTime / lerpTime */
-    float LinearStepf(float t) {
+    public float LinearStepf(float t) {
 		return ( Time.time - t ) / 1.0f;
 	}
 
