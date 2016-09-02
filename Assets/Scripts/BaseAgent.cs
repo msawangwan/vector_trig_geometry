@@ -4,42 +4,42 @@ public class BaseAgent : MonoBehaviour {
 
     public bool ClickToFollow = true;
 
-    Vector3 acceleration = Vector3.zero; // acceleration = force / mass
-    Vector3 velocity = Vector3.zero; // velocity += acceleration * TimeElapsed
-    Vector3 pos = Vector3.zero; // pos += trunc(velocity) * TimeElapsed;
+    float mass = 15.0f;
+    float maximumSpeed = 5.0f;
+    float maximumForce = 0f;
+    float maximumTurnRate = 0f;
 
-    void Update ( ) {
+    Vector3 velocity = Vector3.zero; // velocity += acceleration * TimeElapsed
+    Quaternion rotation = Quaternion.identity;
+
+    void Update () {
         if (Input.GetMouseButton(0) || ClickToFollow == false) {
             Vector3 targetPos = MousePointer.Pos ();
-            Quaternion rot = ToTargetRot (transform.position, targetPos);
-            //Vector3 pos 
-            transform.rotation = rot;
+
+            rotation = GetRotationDegrees (transform.position, targetPos);
+            velocity = GetVelocityIncrement (velocity, transform.position, targetPos, maximumSpeed, Time.deltaTime);
+
+            transform.rotation = rotation;
+            transform.position += velocity;
+            transform.DrawLocalAxis ();
         }
     }
 
-    Vector3 ToTargetPos ( Vector3 pos, Vector3 target ) {
-        return target - pos;
+    /* Returns a Vector representing amount of velocity to add to total velocity. This velocity should be applied to a target position to move the transform. */
+    Vector3 GetVelocityIncrement ( Vector3 currentVel, Vector3 currentPos, Vector3 targetPos, float maxSpeed, float tElapsed ) {
+        Vector3 sForce = currentPos.DesiredVelocity ( targetPos, currentVel, maxSpeed ); // TODO: Steering.Calculate() ??
+        Vector3 accel = sForce / mass; // acceleration = force / mass
+        currentVel += accel * tElapsed; // velocity += acceleration * TimeElapsed
+
+        return currentVel.Truncate(maxSpeed); // pos += trunc(velocity) * TimeElapsed
     }
 
     /* Returns a Quaternion representing the rotation to apply to rotate from current facing to facing target. */
-    Quaternion ToTargetRot ( Vector3 facing, Vector3 target ) {
+    Quaternion GetRotationDegrees ( Vector3 facing, Vector3 target ) {
         Vector3 heading = (target - facing).normalized;
         float theta = Mathf.Acos ( Vector3.Dot ( Vector3.right, heading ) ) * Mathf.Rad2Deg;
 
         if ( heading.y < 0 ) return Quaternion.Euler ( 0f, 0f, 270f - theta ); 
         else return Quaternion.Euler ( 0f, 0f, theta - 90f );
     }
-
-	/* magnitude = d = sqrt ( (x2-x1) + (y2-y1) ) */
-	float Distancef ( Vector3 a, Vector3 b ) {
-		return Mathf.Sqrt ( ( ( b.x - a.x ) * ( b.x - a.x ) ) + ( ( b.y - a.y ) * ( b.y - a.y ) ) );
-	}
-
-	float sqrDistancef ( Vector3 a, Vector3 b ) {
-		return  ( ( b.x - a.x ) * ( b.x - a.x ) ) + ( ( b.y - a.y ) * ( b.y - a.y ) );
-	}
-
-	void PaintRay2DHeading () {
-		Debug.DrawRay ( transform.position, transform.up * 3.0f, Color.yellow, 0.2f, false );
-	}
 }
