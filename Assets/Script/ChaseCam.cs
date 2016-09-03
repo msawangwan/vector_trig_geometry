@@ -1,38 +1,64 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(TransformInterpolator))]
 public class ChaseCam : MonoBehaviour {
+
     const int xPerimeter = 5;
     const int yPerimeter = 5;
-    float t = 0f;
-    bool isChase = false;
+    const float zDepth = -10f;
+
     public Transform ChaseTarget;
-    TransformInterpolator interpolator;
-    Vector3 p = Vector3.zero;
+    
+    bool chasing = false;
+    float t = 0f;
+
+    Vector3 cameraPos = Vector3.zero;
+    Vector3 targetPos = Vector3.zero;
     Vector3 vel = Vector3.zero;
-    void Start () {
+    Vector3 interpolation = Vector3.zero;
 
-        interpolator = GetComponent<TransformInterpolator>();
-		if (interpolator == null) {
-            interpolator = gameObject.AddComponent<TransformInterpolator>();
+    void Update() {
+
+        cameraPos = transform.position;
+        targetPos = ChaseTarget.position;
+
+        if (CheckBounds (cameraPos, targetPos) && !chasing) {
+            transform.position = cameraPos;
+        } else t = StartChase(cameraPos, targetPos);
+
+        if (chasing) {
+            if (Chase(cameraPos, targetPos, vel, t)) {
+                chasing = false;
+            }
         }
-
-        interpolator.isSlerpEnabled = false;
-        interpolator.isLerpEnabled = true;
-        interpolator.isInterpolating = true;
     }
-	void Update() {
-        Debug.Log(ChaseTarget.localPosition.x);
-        Debug.Log(ChaseTarget.position.x);
-        if (ChaseTarget.localPosition.x > xPerimeter || ChaseTarget.localPosition.y > yPerimeter) {
-            isChase = true;
-        } else {
-            isChase = false;
-        }
 
-		if (isChase) {
-            p = new Vector3(ChaseTarget.position.x, ChaseTarget.position.y, -10);
-            transform.position = Vector3.SmoothDamp(transform.position, p, ref vel, 0.25f);
-        }
+    float StartChase (Vector3 start, Vector3 end) {
+        chasing = true;
+
+        cameraPos = start;
+        targetPos = end;
+        end.z = zDepth;
+
+        return Time.deltaTime;
+    }
+
+    bool Chase (Vector3 s, Vector3 e, Vector3 v, float t) {
+        float p = (Time.deltaTime - t ) / 1.0f;
+        e.z = zDepth;
+        transform.position = Vector3.SmoothDamp(s, e, ref v, t);
+
+        if (p >= 1.0f) return true;
+        else return false;
+    }
+
+    Vector3 GetInterpolationVector (Vector3 startingFrom, Vector3 to, Vector3 v, float t = 0.25f) {
+        to.z = zDepth;
+        return Vector3.SmoothDamp ( startingFrom, to, ref v, t );
+    }
+
+    bool CheckBounds (Vector3 a, Vector3 b) {
+        Debug.Log("a" + (a.x + xPerimeter));
+        Debug.Log("b" + b.x);
+        return ( ( a.x + xPerimeter ) < b.x ) || ( ( a.y + yPerimeter ) < b.y );
     }
 }
