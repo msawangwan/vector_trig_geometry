@@ -329,6 +329,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChaseTarget: {fileID: 445613060}
+  StepSizeAccumulator: 766
+  SpringTension: 6.1
+  Damping: 0.15
 --- !u!1001 &1555548907
 Prefab:
   m_ObjectHideFlags: 0
@@ -342,7 +345,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000011482986412, guid: 3828023ed65ba43fca85b6463d85b8bd, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 1.7
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4000011482986412, guid: 3828023ed65ba43fca85b6463d85b8bd, type: 2}
       propertyPath: m_LocalPosition.z
