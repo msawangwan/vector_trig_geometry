@@ -4,20 +4,25 @@ public class BaseAgent : MonoBehaviour {
 
     public bool ClickToFollow = true;
 
-    float mass = 15.0f;
-    float maximumSpeed = 5.0f;
-    float maximumForce = 0f;
-    float maximumTurnRate = 0f;
-
-    Vector3 velocity = Vector3.zero; // velocity += acceleration * TimeElapsed
+    Vector3 velocity = Vector3.zero; // velocity += acceleration * TimeElapsed <- TODO: use the steeringagent velocity
     Quaternion rotation = Quaternion.identity;
+
+    SteeringAgent steeringController;
+    public SteeringAgent targetAgentSteeringController;
+
+    void Start () {
+        steeringController = GetComponent<SteeringAgent>();
+        if (steeringController == null) {
+            gameObject.AddComponent<SteeringAgent>();
+        }
+    }
 
     void Update () {
         if (Input.GetMouseButton(0) || ClickToFollow == false) {
             Vector3 targetPos = MousePointer.Pos ();
 
             rotation = GetRotationDegrees (transform.position, targetPos);
-            velocity = GetVelocityIncrement (velocity, transform.position, targetPos, maximumSpeed, Time.deltaTime);
+            velocity = GetVelocityIncrement (velocity, targetPos, Time.deltaTime);
 
             transform.rotation = rotation;
             transform.position += velocity;
@@ -25,10 +30,10 @@ public class BaseAgent : MonoBehaviour {
         }
 
         if (Input.GetMouseButton(1) || ClickToFollow == false) {
-            Vector3 targetPos = MousePointer.Pos ();
+            Vector3 targetPos = targetAgentSteeringController.Position;
 
             rotation = GetRotationDegrees (transform.position, targetPos);
-            velocity = GetFleeVelocityIncrement (velocity, transform.position, targetPos, maximumSpeed, Time.deltaTime);
+            velocity = GetFleeVelocityIncrement (velocity, targetPos, Time.deltaTime);
 
             transform.rotation = rotation;
             transform.position += velocity;
@@ -37,21 +42,21 @@ public class BaseAgent : MonoBehaviour {
     }
 
     /* Returns a Vector representing amount of velocity to add to total velocity. This velocity should be applied to a target position to move the transform. */
-    Vector3 GetVelocityIncrement ( Vector3 currentVel, Vector3 currentPos, Vector3 targetPos, float maxSpeed, float tElapsed ) {
-        Vector3 sForce = currentPos.Arrive ( targetPos, currentVel, maxSpeed ); // TODO: Steering.Calculate() ??
-        Vector3 accel = sForce / mass; // acceleration = force / mass
+    Vector3 GetVelocityIncrement ( Vector3 currentVel, Vector3 targetPos, float tElapsed ) {
+        Vector3 sForce = steeringController.Seek ( targetPos ); // TODO: Steering.Calculate() ??
+        Vector3 accel = sForce / steeringController.Mass; // acceleration = force / mass
         currentVel += accel * tElapsed; // velocity += acceleration * TimeElapsed
 
-        return currentVel.Truncate(maxSpeed); // pos += trunc(velocity) * TimeElapsed
+        return currentVel.Truncate(steeringController.MaximumSpeed); // pos += trunc(velocity) * TimeElapsed
     }
 
     /* Returns a Vector representing amount of velocity to add to total velocity. This velocity should be applied to a target position to move the transform. */
-    Vector3 GetFleeVelocityIncrement ( Vector3 currentVel, Vector3 currentPos, Vector3 targetPos, float maxSpeed, float tElapsed ) {
-        Vector3 sForce = currentPos.Seek ( targetPos, currentVel, maxSpeed ); // TODO: Steering.Calculate() ??
-        Vector3 accel = sForce / mass; // acceleration = force / mass
+    Vector3 GetFleeVelocityIncrement ( Vector3 currentVel, Vector3 targetPos, float tElapsed ) {
+        Vector3 sForce = steeringController.Pursue ( targetAgentSteeringController ); // TODO: Steering.Calculate() ??
+        Vector3 accel = sForce / steeringController.Mass; // acceleration = force / mass
         currentVel += accel * tElapsed; // velocity += acceleration * TimeElapsed
 
-        return currentVel.Truncate(maxSpeed); // pos += trunc(velocity) * TimeElapsed
+        return currentVel.Truncate(steeringController.MaximumSpeed); // pos += trunc(velocity) * TimeElapsed
     }
 
     /* Returns a Quaternion representing the rotation to apply to rotate from current facing to facing target. */
