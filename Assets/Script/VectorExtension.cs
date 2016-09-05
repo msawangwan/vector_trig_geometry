@@ -2,9 +2,15 @@
 
 public static class VectorExtension {
 
+    // add RANDOM VECTOR AND CLAMPED 0,1 RANDOM
+
     /* prettify for output to console (x and y only) */
     public static string Stringify2 (this Vector3 a) {
         return a.x.ToString() + "," + a.y.ToString();
+    }
+
+    public static Vector3 PointRandomOnUnitCircle (float radius = 1.0f, float z = 0f) {
+        return new Vector3(radius * Mathf.Cos(FloatExtension.RandTheta()), radius * Mathf.Sin(FloatExtension.RandTheta()), z);
     }
 
     /* return the right hand normal of a 2D vector */

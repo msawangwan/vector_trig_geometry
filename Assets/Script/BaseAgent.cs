@@ -8,7 +8,8 @@ public class BaseAgent : MonoBehaviour {
     Quaternion rotation = Quaternion.identity;
 
     SteeringAgent steeringController;
-    public SteeringAgent targetAgentSteeringController;
+    public SteeringAgent a;
+    public SteeringAgent b;
 
     void Start () {
         steeringController = GetComponent<SteeringAgent>();
@@ -27,10 +28,12 @@ public class BaseAgent : MonoBehaviour {
             transform.rotation = rotation;
             transform.position += velocity;
             transform.DrawLocalAxis ();
+            transform.DrawHeading(velocity);
         }
 
         if (Input.GetMouseButton(1) || ClickToFollow == false) {
-            Vector3 targetPos = targetAgentSteeringController.Position;
+            //Vector3 targetPos = a.Position;
+            Vector3 targetPos = MousePointer.Pos();
 
             rotation = GetRotationDegrees (transform.position, targetPos);
             velocity = GetFleeVelocityIncrement (velocity, targetPos, Time.deltaTime);
@@ -38,12 +41,16 @@ public class BaseAgent : MonoBehaviour {
             transform.rotation = rotation;
             transform.position += velocity;
             transform.DrawLocalAxis ();
+            transform.DrawHeading(velocity);
         }
     }
+
+    /* velocity is calculated by the numerical integration:  v_1 = v_0 + f / m * dt */
 
     /* Returns a Vector representing amount of velocity to add to total velocity. This velocity should be applied to a target position to move the transform. */
     Vector3 GetVelocityIncrement ( Vector3 currentVel, Vector3 targetPos, float tElapsed ) {
         Vector3 sForce = steeringController.Seek ( targetPos ); // TODO: Steering.Calculate() ??
+        //Vector3 sForce = steeringController.AvoidObstacle(Obstacle.Obstacles); // TODO: Steering.Calculate() ??
         Vector3 accel = sForce / steeringController.Mass; // acceleration = force / mass
         currentVel += accel * tElapsed; // velocity += acceleration * TimeElapsed
 
@@ -52,7 +59,9 @@ public class BaseAgent : MonoBehaviour {
 
     /* Returns a Vector representing amount of velocity to add to total velocity. This velocity should be applied to a target position to move the transform. */
     Vector3 GetFleeVelocityIncrement ( Vector3 currentVel, Vector3 targetPos, float tElapsed ) {
-        Vector3 sForce = steeringController.Pursue ( targetAgentSteeringController ); // TODO: Steering.Calculate() ??
+        //Vector3 sForce = steeringController.Interpose ( a, b ); // TODO: Steering.Calculate() ??
+        //Vector3 sForce = steeringController.Seek ( targetPos ); // TODO: Steering.Calculate() ??
+        Vector3 sForce = steeringController.Hide(a, Obstacle.Obstacles);
         Vector3 accel = sForce / steeringController.Mass; // acceleration = force / mass
         currentVel += accel * tElapsed; // velocity += acceleration * TimeElapsed
 
