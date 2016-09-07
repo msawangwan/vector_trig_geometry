@@ -47,6 +47,10 @@ public class ElasticChaseCam : MonoBehaviour {
 
     void Update () {
 
+        if (ChaseTarget == null) {
+            return;
+        }
+
         camRestPos = transform.position;
         camTargetPos = ChaseTargetCameraPosition(ChaseTarget.position);
 

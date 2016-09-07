@@ -11,7 +11,6 @@ public class Obstacle : MonoBehaviour
 
     void Start () {
         Obstacles.Add(this);
-        Debug.Log(Obstacles.Count);
         IsTagged = false;
     }
 }

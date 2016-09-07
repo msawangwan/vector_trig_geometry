@@ -59,9 +59,10 @@ public class BaseAgent : MonoBehaviour {
 
     /* Returns a Vector representing amount of velocity to add to total velocity. This velocity should be applied to a target position to move the transform. */
     Vector3 GetFleeVelocityIncrement ( Vector3 currentVel, Vector3 targetPos, float tElapsed ) {
-        //Vector3 sForce = steeringController.Interpose ( a, b ); // TODO: Steering.Calculate() ??
-        //Vector3 sForce = steeringController.Seek ( targetPos ); // TODO: Steering.Calculate() ??
-        Vector3 sForce = steeringController.Hide(a, Obstacle.Obstacles);
+        Vector3 sForce = steeringController.Interpose ( a, b ); // TODO: Steering.Calculate() ??
+        sForce += steeringController.Hide(a, Obstacle.Obstacles);
+        sForce += steeringController.AvoidObstacle(Obstacle.Obstacles); // TODO: Steering.Calculate() ??
+        sForce += steeringController.Seek ( targetPos ); // TODO: Steering.Calculate() ??
         Vector3 accel = sForce / steeringController.Mass; // acceleration = force / mass
         currentVel += accel * tElapsed; // velocity += acceleration * TimeElapsed
 
