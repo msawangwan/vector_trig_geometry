@@ -33,7 +33,7 @@ public class PlayerAgent : MonoBehaviour {
                 lerpPosition = toPosition;
             };
 
-            //StartCoroutine(Go(Position, targetPosition, 1.0f, cb));
+            StartCoroutine(Go(Position, targetPosition, 1.0f, cb).GetEnumerator());
             Debug.Log(lerpPosition + " AKJDLKSAD");
             transform.position = lerpPosition;
         }
