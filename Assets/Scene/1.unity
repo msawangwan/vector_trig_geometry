@@ -228,7 +228,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4abade3b0f4eb3345ae6dc75acd66247, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Origin: {fileID: 0}
+  Origin: {fileID: 855447258}
   DrawOnlyOnClick: 1
 --- !u!4 &661341902
 Transform:
@@ -243,11 +243,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
+--- !u!1 &855447256 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 1000010077305390, guid: 30a32c7fcfc924f46acbbcfdfdd2d783,
+    type: 2}
+  m_PrefabInternal: {fileID: 1242287955}
 --- !u!4 &855447258 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4000012740587382, guid: 30a32c7fcfc924f46acbbcfdfdd2d783,
     type: 2}
   m_PrefabInternal: {fileID: 1242287955}
+--- !u!114 &855447259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 855447256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aee831962ead1244ea7be65d3ecb2bf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &892516969
 Prefab:
   m_ObjectHideFlags: 0
@@ -425,6 +441,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1000010077305390, guid: 30a32c7fcfc924f46acbbcfdfdd2d783, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 30a32c7fcfc924f46acbbcfdfdd2d783, type: 2}
   m_IsPrefabParent: 0
@@ -526,6 +546,10 @@ Prefab:
         type: 2}
       propertyPath: IsPlayerController
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000010077305390, guid: 30a32c7fcfc924f46acbbcfdfdd2d783, type: 2}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 30a32c7fcfc924f46acbbcfdfdd2d783, type: 2}
