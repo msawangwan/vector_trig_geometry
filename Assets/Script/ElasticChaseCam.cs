@@ -59,7 +59,7 @@ public class ElasticChaseCam : MonoBehaviour {
     Vector3 camDisplacement = Vector3.zero;
     Vector3 camVelocity     = Vector3.zero; // vertex velocity
 
-    float pointForce = 5.0f;
+    float pointForce = 2.0f;
 
     State state = null;
     State initialState = null;
@@ -77,13 +77,12 @@ public class ElasticChaseCam : MonoBehaviour {
     }
 
     void Poses () {
-        camRestPos = transform.position;
-        camTargetPos = camRestPos;
+        camRestPos = ChaseTargetCameraPosition(ChaseTarget.position);
     }
 
     void GetCamVel () {
-        Vector3 restToTarget = camTargetPos - camTargetPos;
-        float f = pointForce / restToTarget.sqrMagnitude;
+        Vector3 restToTarget = camTargetPos - transform.position;
+        float f = pointForce / (1f + restToTarget.sqrMagnitude);
         float v = f * Time.deltaTime;
         camVelocity += restToTarget * v;
     }
@@ -93,11 +92,11 @@ public class ElasticChaseCam : MonoBehaviour {
     }
 
     void UpdateSpring () {
-        Vector3 displacement = camDisplacement - camRestPos;
+        Vector3 displacement = camDisplacement - transform.position;
         camVelocity -= displacement * SpringConstant * Time.deltaTime;
         camVelocity *= 1f - DampingConstant * Time.deltaTime;
         camDisplacement += camVelocity * Time.deltaTime;
-        transform.position += camDisplacement;
+        transform.position += camDisplacement.Truncate(2.0f);
     }
 
     void UpdateBad () {
