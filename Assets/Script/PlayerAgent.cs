@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections;
 
 public class PlayerAgent : MonoBehaviour {
 
@@ -13,6 +11,7 @@ public class PlayerAgent : MonoBehaviour {
     Vector3 heading { get { return toPosition.normalized; } }
 
     float speed { get { return velocity.magnitude; } }
+    float speedMultiplier { get { return 5.0f; } }
     float maxSpeed { get { return 3.0f; } }
 
     float tStart { get; set; }
@@ -20,29 +19,21 @@ public class PlayerAgent : MonoBehaviour {
     float t { get; set; }
     float dt { get { return Time.deltaTime; } }
 
-    void Start () {
-        tStart = 1.0f;
-    }
+
+    bool going = false;
+    ToTargetMoveController2D mc = new ToTargetMoveController2D();
 
     void Update () {
 
-        if (Input.GetMouseButton (0)) {
+        if (Input.GetMouseButton (0) && going == false) {
             targetPosition = MousePointer.Pos();
-            toPosition = targetPosition - Position;
-
-            float d = toPosition.magnitude;
-            float s = d / dt;
+            going = true;
         }
-    }
 
-    IEnumerator Go(Vector3 s, Vector3 e, float dur) {
-        float i = 0.0f;
-        float rate = 1.0f / dur; // check for 0
-
-        while (i < 1.0f) {
-            i += dt * rate;
-            transform.position = Vector3.Lerp(s, e, Mathf.SmoothStep(0.0f,1.0f, i));
-            yield return null;
+        if ( going ) {
+             if ( mc.MoveUntilArrived ( gameObject.transform, targetPosition, speedMultiplier, dt ) ) {
+                going = false;
+            }
         }
     }
 }

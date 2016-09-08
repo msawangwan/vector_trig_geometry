@@ -25,6 +25,14 @@ public static class FloatExtension {
         return new Vector3(Mathf.Cos(a), Mathf.Sin(a), z);
     }
 
+    // TODO: verify how this works and compare with AsAngledVector2
+    public static Vector3 GetRandHeading (this float heading, float maxHeadingChange) {
+        float floor = Mathf.Clamp(heading - maxHeadingChange, 0.0f, 360.0f);
+        float ceil = Mathf.Clamp(heading + maxHeadingChange, 0.0f, 360.0f);
+        float newHeading = Random.Range(floor, ceil);
+        return new Vector3(0, newHeading, 0);
+    }
+
 	/* convert to rgb value */
 	public static float AsRGB(this float f) {
         return f / 255.0f;

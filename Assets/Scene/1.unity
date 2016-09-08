@@ -654,9 +654,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChaseTarget: {fileID: 855447258}
-  StepSizeAccumulator: 766
-  SpringTension: 6.1
-  Damping: 0.15
+  StepSizeAccumulator: 58
+  SpringConstant: 6.1
+  DampingConstant: 0.15
 --- !u!4 &1780469947 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4000010757585512, guid: f405b3c52601b403cbdd89fc2dd2e212,
