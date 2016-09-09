@@ -650,13 +650,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1402770382}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 478009936d54b481b81406e360f57923, type: 3}
+  m_Script: {fileID: 11500000, guid: 0c370d59040b7cb4395ebe5dbe08e18a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ChaseTarget: {fileID: 855447258}
-  StepSizeAccumulator: 58
-  SpringConstant: 6.1
-  DampingConstant: 0.15
+  ElasticityConstant: 6.1
+  DampingConstant: 22.6
+  ForceConstant: 5
+  MassConstant: 1
+  CameraMaximumPanSpeed: 10
+  ThresholdMax: 20
+  ThresholdMin: 2.5
 --- !u!4 &1780469947 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4000010757585512, guid: f405b3c52601b403cbdd89fc2dd2e212,

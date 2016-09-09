@@ -64,51 +64,11 @@ public class ElasticChaseCam : MonoBehaviour {
     State state = null;
     State initialState = null;
 
-    void StartOld () {
+    void Start () {
         initialState = new State (0f, Time.deltaTime);
     }
 
-    void Update() {
-        Poses();
-        GetCamVel();
-
-        UpdateCamDisplacement();
-        UpdateSpring();
-    }
-
-    void Poses () {
-        camRestPos = ChaseTargetCameraPosition(ChaseTarget.position);
-    }
-
-    void GetCamVel () {
-        Vector3 restToTarget = camTargetPos - transform.position;
-        float f = pointForce / (1f + restToTarget.sqrMagnitude);
-        float v = f * Time.deltaTime;
-        camVelocity += restToTarget * v;
-    }
-
-    void UpdateCamDisplacement () {
-        camDisplacement += camVelocity * Time.deltaTime;
-    }
-
-    void UpdateSpring () {
-        Vector3 displacement = camDisplacement - transform.position;
-        camVelocity -= displacement * SpringConstant * Time.deltaTime;
-        camVelocity *= 1f - DampingConstant * Time.deltaTime;
-        camDisplacement += camVelocity * Time.deltaTime;
-        transform.position += camDisplacement.Truncate(2.0f);
-    }
-
-    void UpdateBad () {
-        camRestPos = transform.position;
-        camTargetPos = ChaseTargetCameraPosition(ChaseTarget.position);
-        Vector3 f = SpringForce(SpringConstant, DampingConstant);
-        Debug.Log(f.Stringify2());
-        transform.position += f.Truncate(2.0f) * Time.deltaTime;
-        transform.DrawLineToTarget(ChaseTarget.position);
-    }
-
-    void UpdateOld () {
+    void Update () {
 
         if (ChaseTarget == null) {
             return;
