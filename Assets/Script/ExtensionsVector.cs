@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public static class VectorExtension {
+public static class ExtensionsVector {
 
     // add RANDOM VECTOR AND CLAMPED 0,1 RANDOM
 
@@ -10,7 +10,7 @@ public static class VectorExtension {
     }
 
     public static Vector3 PointRandomOnUnitCircle (float radius = 1.0f, float z = 0f) {
-        return new Vector3(radius * Mathf.Cos(FloatExtension.RandTheta()), radius * Mathf.Sin(FloatExtension.RandTheta()), z);
+        return new Vector3(radius * Mathf.Cos(ExtensionsFloat.RandTheta()), radius * Mathf.Sin(ExtensionsFloat.RandTheta()), z);
     }
 
     /* return the right hand normal of a 2D vector */

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public static class FloatExtension {
+public static class ExtensionsFloat {
 
     public const float TwoPI = Mathf.PI;
 

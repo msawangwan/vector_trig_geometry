@@ -17,21 +17,21 @@ public class Mover : MonoBehaviour {
     void Update () {
         if (Input.GetMouseButton (0) && isMoving == false) {
             targetPosition = MousePointer.Pos();
-            ToggleMoveMarker(targetPosition);
+            ToggleMarker ( targetPosition );
             isMoving = true;
         }
 
         if ( isMoving ) {
             transform.DrawLineToTarget ( targetPosition );
             if ( mc.MoveUntilArrived ( gameObject.transform, targetPosition, speedMultiplier, Time.deltaTime ) ) {
-                ToggleMoveMarker(Vector3.zero);
+                ToggleMarker ( Vector3.zero );
                 isMoving = false;
             }
             mc.RotateUntilFacingTarget ( gameObject.transform, targetPosition );
         }
     }
 
-    void ToggleMoveMarker (Vector3 position) {
+    void ToggleMarker ( Vector3 position ) {
         if (!moveMarker.gameObject.activeInHierarchy) {
             moveMarker.parent = null;
             moveMarker.position = position;

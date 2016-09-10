@@ -52,7 +52,7 @@ public class SteeringAgent : MonoBehaviour {
 
 	void Awake () {
 		if (agentData.IsWanderingEnabled) {
-			WanderTarget = VectorExtension.PointRandomOnUnitCircle();
+			WanderTarget = ExtensionsVector.PointRandomOnUnitCircle();
 		}
 	}
 }

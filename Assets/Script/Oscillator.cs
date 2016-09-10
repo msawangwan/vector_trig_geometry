@@ -14,7 +14,7 @@ public class Oscillator {
         Period = period;
     }
 
-    public void Oscillate (Transform myTransform, Vector3 startingPos) {
+    public void Oscillate ( Transform myTransform, Vector3 startingPos ) {
         myTransform.position = startingPos + Vector3.up * ( Amp *  Mathf.Sin ( Time.timeSinceLevelLoad / Period ) );
     }
 }

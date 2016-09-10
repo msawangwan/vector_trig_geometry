@@ -8,7 +8,7 @@ public class AutoAgent : MonoBehaviour {
     public static List<AutoAgent> Agents = new List<AutoAgent>();
     public static List<GameObject> Entities = new List<GameObject>();
 
-    public Vector3 Pos { get { return transform.position; } }
+    public Vector3 Position { get { return transform.position; } }
     public bool Tagged { get; set; }
 
     void Awake () {

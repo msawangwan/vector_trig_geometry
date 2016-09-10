@@ -74,7 +74,7 @@ public static class SteeringBehaviour {
 		Vector3 wanderer = wandering.Position;
 
 		float jitterTimeslice = wanderJitter * wandering.TElapsed;
-		wandering.WanderTarget += new Vector3(FloatExtension.RandClamped() * jitterTimeslice, FloatExtension.RandClamped() * jitterTimeslice, wanderer.z);
+		wandering.WanderTarget += new Vector3(ExtensionsFloat.RandClamped() * jitterTimeslice, ExtensionsFloat.RandClamped() * jitterTimeslice, wanderer.z);
 		Vector3 wanderTarget = (wandering.WanderTarget.normalized * wanderRadius) + new Vector3(wanderDistance, 0, wanderer.z);
 
 		return wandering.AgentTransform.TransformPoint(wanderTarget) - wandering.Position;

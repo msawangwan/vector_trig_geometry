@@ -19,19 +19,20 @@ public static class ExtensionsGameObject {
         return marker;
     }
 
-    public static GameObject Closest ( this GameObject self, Vector3 pos, List<GameObject> entities ) {
+    public static GameObject Closest ( this GameObject self, List<GameObject> entities ) {
         GameObject closest = null;
         float dMin = Mathf.Infinity;
         int i = 0;
         while (i < entities.Count) {
             GameObject curr = entities[i];
-            Debug.Log("checking for closest: ", curr);
-            if (curr == self) continue;
-            float dSqr = (curr.transform.position - pos).sqrMagnitude;
-            if (dSqr < dMin) {
-                dMin = dSqr;
-                closest = curr;
-                Debug.Log("updating closest: ", curr);
+            if (curr == self) {
+                Debug.Log("skip self");
+            } else {
+                float dToCurrSqr = (curr.transform.position - self.transform.position).sqrMagnitude;
+                if (dToCurrSqr < dMin) {
+                    dMin = dToCurrSqr;
+                    closest = curr;
+                }
             }
             i++;
         }

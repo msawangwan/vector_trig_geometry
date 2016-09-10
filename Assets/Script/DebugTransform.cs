@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public static class TransformDebug {
+public static class DebugTransform {
 
     /* draw x and y axes in transform local space */
     public static void DrawLocalAxis (this Transform self, float scale = 3.0f) {
