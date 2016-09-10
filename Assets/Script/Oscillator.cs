@@ -1,25 +1,20 @@
 ﻿using UnityEngine;
 
-public class Oscillator : MonoBehaviour {
+public class Oscillator {
+    public float Amp { get; private set; }
+    public float Period { get; private set; }
 
-    public bool OscillationEnabled;
-
-    float amp = 0.3f;
-    float period = 2f;
-
-    Vector3 startPos = Vector3.zero;
-
-    void Start () {
-        startPos = transform.position;
+    public Oscillator  () {
+        Amp = 0.1f;
+        Period = 0.1f;
     }
 
-    void Update () {
-        if ( OscillationEnabled ) {
-            Oscillate ();
-        }
+    public Oscillator ( float amp, float period ) {
+        Amp = amp;
+        Period = period;
     }
 
-    void Oscillate () {
-        transform.position = startPos + Vector3.up * ( amp *  Mathf.Sin ( Time.timeSinceLevelLoad / period ) );
+    public void Oscillate (Transform myTransform, Vector3 startingPos) {
+        myTransform.position = startingPos + Vector3.up * ( Amp *  Mathf.Sin ( Time.timeSinceLevelLoad / Period ) );
     }
 }

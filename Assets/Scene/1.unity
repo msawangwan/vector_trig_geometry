@@ -90,22 +90,6 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualCellSize: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &84481586 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1000010077305390, guid: 30a32c7fcfc924f46acbbcfdfdd2d783,
-    type: 2}
-  m_PrefabInternal: {fileID: 1348159064}
---- !u!114 &84481587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 84481586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e473ee5d9aa5fb04db165d0c47dce939, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &154210674 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4000010757585512, guid: f405b3c52601b403cbdd89fc2dd2e212,
@@ -261,9 +245,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 855447256}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aee831962ead1244ea7be65d3ecb2bf8, type: 3}
+  m_Script: {fileID: 11500000, guid: e473ee5d9aa5fb04db165d0c47dce939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MoveMarkerPrefab: {fileID: 1000011354290424, guid: f216207e8c93d4e66a35367c2549ec62,
+    type: 2}
+  speedMultiplier: 5
 --- !u!1001 &892516969
 Prefab:
   m_ObjectHideFlags: 0
@@ -566,6 +553,7 @@ GameObject:
   - 92: {fileID: 1402770385}
   - 124: {fileID: 1402770384}
   - 81: {fileID: 1402770383}
+  - 114: {fileID: 1402770389}
   - 114: {fileID: 1402770388}
   m_Layer: 0
   m_Name: main_camera
@@ -654,13 +642,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ChaseTarget: {fileID: 855447258}
-  ElasticityConstant: 6.1
-  DampingConstant: 22.6
-  ForceConstant: 5
-  MassConstant: 1
-  CameraMaximumPanSpeed: 10
-  ThresholdMax: 20
-  ThresholdMin: 2.5
+  CameraMaximumChaseSpeed: 10
+  DelayRadius: 5
+  KillChaseRadius: 0.5
+--- !u!114 &1402770389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1402770382}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478009936d54b481b81406e360f57923, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ChaseTarget: {fileID: 855447258}
+  SpringConstant: 1
+  DampingConstant: 0.1
 --- !u!4 &1780469947 stripped
 Transform:
   m_PrefabParentObject: {fileID: 4000010757585512, guid: f405b3c52601b403cbdd89fc2dd2e212,

@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
-public class PlayerAgent : MonoBehaviour {
+public class PlayerAgent : MonoBehaviour
+{
 
-    public Vector3 Position { get { return transform.position;  } }
+    public Vector3 Position { get { return transform.position; } }
 
     Vector3 targetPosition { get; set; }
     Vector3 lerpPosition { get; set; }
@@ -18,22 +19,4 @@ public class PlayerAgent : MonoBehaviour {
     float tElapsed { get; set; }
     float t { get; set; }
     float dt { get { return Time.deltaTime; } }
-
-
-    bool going = false;
-    ToTargetMoveController2D mc = new ToTargetMoveController2D();
-
-    void Update () {
-
-        if (Input.GetMouseButton (0) && going == false) {
-            targetPosition = MousePointer.Pos();
-            going = true;
-        }
-
-        if ( going ) {
-             if ( mc.MoveUntilArrived ( gameObject.transform, targetPosition, speedMultiplier, dt ) ) {
-                going = false;
-            }
-        }
-    }
 }

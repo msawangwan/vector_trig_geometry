@@ -1,37 +1,45 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 public class Mover : MonoBehaviour {
+    public GameObject MoveMarkerPrefab  = null;
 
-    public Vector3 Pos { get { return transform.position; } }
+    public float       speedMultiplier   = 5.0f;
+
+    Transform         moveMarker        = null;
+    Vector3           targetPosition    = Vector3.zero;
+    MoveController2D  mc                = new MoveController2D();
+    bool              isMoving          = false;
+
+    void Start () {
+        moveMarker = MoveMarkerPrefab.InstantiateAtPositionToParent ( gameObject.transform, Vector3.zero, false ).transform;
+    }
 
     void Update () {
-        Go();
-    }
-
-    void Go () {
-        Vector3 p = Pos;
-        Vector3 c = Closest(p, AutoAgent.Entities).transform.position;
-    }
-
-    GameObject Closest (Vector3 pos, List<GameObject> entities) {
-        GameObject closest = null;
-        float dMin = Mathf.Infinity;
-        int i = 0;
-
-        while (i < entities.Count) {
-            GameObject curr = entities[i];
-            Debug.Log("checking for closest: ", curr);
-            if (curr == this) continue;
-            float dSqr = (curr.transform.position - pos).sqrMagnitude;
-            if (dSqr < dMin) {
-                dMin = dSqr;
-                closest = curr;
-                Debug.Log("updating closest: ", curr);
-            }
-            i++;
+        if (Input.GetMouseButton (0) && isMoving == false) {
+            targetPosition = MousePointer.Pos();
+            ToggleMoveMarker(targetPosition);
+            isMoving = true;
         }
 
-        return closest;
+        if ( isMoving ) {
+            transform.DrawLineToTarget ( targetPosition );
+            if ( mc.MoveUntilArrived ( gameObject.transform, targetPosition, speedMultiplier, Time.deltaTime ) ) {
+                ToggleMoveMarker(Vector3.zero);
+                isMoving = false;
+            }
+            mc.RotateUntilFacingTarget ( gameObject.transform, targetPosition );
+        }
+    }
+
+    void ToggleMoveMarker (Vector3 position) {
+        if (!moveMarker.gameObject.activeInHierarchy) {
+            moveMarker.parent = null;
+            moveMarker.position = position;
+            moveMarker.gameObject.SetActive(true);
+        } else {
+            moveMarker.gameObject.SetActive(false);
+            moveMarker.parent = gameObject.transform;
+            moveMarker.position = position;
+        }
     }
 }
