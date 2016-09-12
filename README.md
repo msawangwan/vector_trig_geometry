@@ -15,7 +15,7 @@
 
 * * *
 
-###### all code and assets/content in this repo falls under the mit license:
+###### unless specified, all code and assets/content in this repo fall(s) under the mit license:
 
 MIT License
 

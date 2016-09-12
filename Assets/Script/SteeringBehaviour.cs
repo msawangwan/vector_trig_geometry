@@ -1,6 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/*
+====
+===
+This script contains functions that I did not come up with on my own. 
+Credit goes to Mat Buckland and his book "Programming Game AI by Example" and Craig Reynolds with his steering behaviours.
+===
+====
+*/
+
 public static class SteeringBehaviour {
 
     /* arrival decel rate */
