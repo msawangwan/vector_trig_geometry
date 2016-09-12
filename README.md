@@ -4,6 +4,8 @@
 
 * * *
 
+## About
+
 - Note: _all_ the scripts in this project deal with, and assume, a 2D world -- meaning any given function will need to
   be tweaked to work in the third-dimension, yo!
 - Everything in this project is *WIP* and for *prototyping* purposes
@@ -15,26 +17,48 @@
 
 * * *
 
-###### unless specified, all code and assets/content in this repo fall(s) under the mit license:
+## Noteworthy scripts
 
-MIT License
+#### To save you the time of combing through the code to find the working bits, The following is an evolving list of working scripts that someone may find useful:
 
-Copyright (c) [2016] [misha n. sawangwan]
+_note: load the scene titled '1' to see most of these scripts in action_
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+- ChaseCamBounded.cs
+- ChaseCamElastic.cs
+- ChaseCamTethered.cs
+- Mover.cs (depends on a few other scripts though, but the dependencies can easily be substituted with whatever)
+- Oscillator.cs
+- ExtensionsFloat.cs
+- ExtensionsGameObject.cs
+- ExtensionsVector.cs
+- DebugTransform.cs
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+* * * 
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## Attribution
+
+###### note: unless specified, all code and assets/content in this repo fall(s) under the mit license:
+
+      MIT License
+
+      Copyright (c) 2016 misha n. sawangwan
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy
+      of this software and associated documentation files (the "Software"), to deal
+      in the Software without restriction, including without limitation the rights
+      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      copies of the Software, and to permit persons to whom the Software is
+      furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in all
+      copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+      SOFTWARE.
+
+* * *
