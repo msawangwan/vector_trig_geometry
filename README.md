@@ -1,9 +1,11 @@
 # Vectors, Trig and Geometry
 
-## I Love MATH!!!
+## I Love MATH (2D)!!!
 
 * * *
 
+- Note: _all_ the scripts in this project deal with, and assume, a 2D world -- meaning any given function will need to
+  be tweaked to work in the third-dimension, yo!
 - Everything in this project is *WIP* and for *prototyping* purposes
 - Some code isn't optimized
 - Some scripts are _scratch_ scripts for collecting my notes on various subjects
