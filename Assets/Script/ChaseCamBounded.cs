@@ -15,10 +15,10 @@ public class ChaseCamBounded : MonoBehaviour {
 
 	[TooltipAttribute ( "~ detection zone to start chasing on for left and right sides of screen" )]
 	[RangeAttribute ( 10.0f, 1000.0f )]
-	public float xAxisBuffer = 20.0f; // TODO: calculate as percentage!!
+	public float xAxisBuffer = 110.0f; // TODO: calculate as percentage!!
 	[TooltipAttribute( "~ detection zone to start chasing for top and bottom areas of screen" )]
 	[RangeAttribute ( 10.0f, 1000.0f )]
-	public float yAxisBuffer = 20.0f; // TODO: calculate as percentage!!
+	public float yAxisBuffer = 120.0f; // TODO: calculate as percentage!!
 	[TooltipAttribute( "~ max chase speed camera is allowed to achieve" )]
 	[RangeAttribute ( 1.0f, 1000.0f )]
 	public float CameraMaximumChaseSpeed = 10.0f;
