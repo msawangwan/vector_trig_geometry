@@ -12,40 +12,44 @@ using System.Collections;
 
 public class Mover : MonoBehaviour {
 
+    /* references */
     [TooltipAttribute ( "~ assign a gameobject that will serve as a parent container for all marker objects -- tip: use an empty gameobject" )]
-    public Transform  MarkerContainer        = null;
+    public Transform  MarkerQueueContainer   = null;
     [TooltipAttribute ( "~ this prefab is used to mark the current move-to target vector position" )]
     public GameObject MoveMarkerPrefab       = null;
     [TooltipAttribute ( "~ this prefab is used to mark all moves in the move queue" )]
     public GameObject QueuedMoveMarkerPrefab = null;
 
+    /* editor variables */
     [TooltipAttribute ( "~ maximum number of moves allowed to be queued up" )]
     [RangeAttribute ( 1, 50 )]
     public int        MoveBufferCapacity     = 10;
     [TooltipAttribute ( "~ adjusts the move-to time of the moving object" )]
     [RangeAttribute ( 0.1f, 1000.1f )]
-    public float       MoveSpeedMultiplier    = 5.0f;
+    public float      MoveSpeedMultiplier    = 5.0f;
     [TooltipAttribute ( "~ adjusts the amount of time to wait before performing the next move" )]
     [RangeAttribute ( 0.1f, 10.1f )]
-    public float       MoveDelay              = 0.15f;
+    public float      MoveDelay              = 0.15f;
     [TooltipAttribute ( "~ rate limits clicks registered as actual clicks" )]
     [RangeAttribute ( 0.1f, 1.1f )]
-    public float       ClickInterval          = 0.5f;
+    public float      ClickInterval          = 0.5f;
 
-    GameObject        moveMarkerObject       = null;
+    /* local variables */
+    GameObject        moveMarker             = null;
     MoveController2D  mc                     = new MoveController2D();
-    Vector3           currentMovePos         = Vector3.zero;
-    float              timeSinceLastClick     = 0.0f;
+    Vector3           targetPosition         = Vector3.zero;
+    float             timeSinceLastClick     = 0.0f;
     bool              isMoving               = false;
 
+    /* local properties */
     Transform         mover                  { get { return gameObject.transform; } }
-    GameObject        moveMarker             { get { return MarkerContainer.GetChild ( 0 ).gameObject; } }
-    Vector3           moveMarkerPos          { get { return moveMarkerObject.transform.position; } }
-    int               markerCount            { get { return MarkerContainer.childCount; } }
-    float              setLastClickTime       { get { return Time.time + ClickInterval; } }
+    GameObject        getNextMarker          { get { return MarkerQueueContainer.GetChild ( 0 ).gameObject; } }
+    Vector3           moveMarkerPos          { get { return moveMarker.transform.position; } }
+    int               markerCount            { get { return MarkerQueueContainer.childCount; } }
+    float             setLastClickTime       { get { return Time.time + ClickInterval; } }
 
     void Update () {
-        if ( MarkerContainer == null ) {
+        if ( MarkerQueueContainer == null ) {
             return;
         }
         if ( Input.GetMouseButton ( 0 ) ) {
@@ -53,33 +57,33 @@ public class Mover : MonoBehaviour {
                 timeSinceLastClick = setLastClickTime;
                 if ( markerCount < MoveBufferCapacity ) {
                     GameObject marker = QueuedMoveMarkerPrefab.InstantiateAtPosition ( MousePointer.Pos () ); // TODO: pool rather than instantiate/destroy
-                    marker.transform.SetParent ( MarkerContainer );
+                    marker.transform.SetParent ( MarkerQueueContainer );
                     marker.transform.SetAsLastSibling ();
-                    if ( isMoving == false && ( moveMarkerObject == null && markerCount == 0 ) ) {
-                        moveMarkerObject = moveMarker;
-                        currentMovePos = moveMarkerPos;
+                    if ( isMoving == false && ( moveMarker == null && markerCount == 0 ) ) {
+                        moveMarker = getNextMarker;
+                        targetPosition = moveMarkerPos;
                         StartCoroutine ( BeginMoveAfterDelay ( MoveDelay ) );
                     }
                 }
             }
         }
         if ( isMoving || markerCount > 0 ) {
-            if ( moveMarkerObject == null ) {
-                moveMarkerObject = moveMarker;
-                currentMovePos = moveMarkerPos;
+            if ( moveMarker == null ) {
+                moveMarker = getNextMarker;
+                targetPosition = moveMarkerPos;
             }
-            if ( mc.MoveUntilArrived ( mover, currentMovePos, MoveSpeedMultiplier, Time.deltaTime ) ) {
-                if ( moveMarkerObject != null ) {
-                    Destroy ( moveMarkerObject );
-                    if ( markerCount > 0 && moveMarkerObject == null ) {
-                        moveMarkerObject = moveMarker;
-                        currentMovePos = moveMarkerPos;
+            if ( mc.MoveUntilArrived ( mover, targetPosition, MoveSpeedMultiplier, Time.deltaTime ) ) {
+                if ( moveMarker != null ) {
+                    Destroy ( moveMarker );
+                    if ( markerCount > 0 && moveMarker == null ) {
+                        moveMarker = getNextMarker;
+                        targetPosition = moveMarkerPos;
                     } else {
                         isMoving = false;
                     }
                 }
             }
-            mc.RotateUntilFacingTarget ( mover, currentMovePos );
+            mc.RotateUntilFacingTarget ( mover, targetPosition );
         }
     }
 
