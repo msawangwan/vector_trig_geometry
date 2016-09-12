@@ -7,12 +7,13 @@
 - Everything in this project is *WIP* and for *prototyping* purposes
 - Some code isn't optimized
 - Some scripts are _scratch_ scripts for collecting my notes on various subjects
+- All other assets are/is original content, i'm not very good at spriting but am trying to improve
 - Originally, this project was just to practice math related functionality
-- Feel free to copy my code, attribution would be nice but...no one's gonna' hold you to it
+- Feel free to copy my code or use my assets, attribution would be nice but...no one's gonna' hold you to it
 
 * * *
 
-###### all code in this repo falls under the mit license:
+###### all code and assets/content in this repo falls under the mit license:
 
 MIT License
 
