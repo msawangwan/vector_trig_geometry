@@ -48,9 +48,13 @@ public class Mover : MonoBehaviour {
     int               markerCount            { get { return MarkerQueueContainer.childCount; } }
     float             setLastClickTime       { get { return Time.time + ClickInterval; } }
 
+    void Start () {
+        CreateMarkerPool(MoveBufferCapacity);
+    }
+
     void Update () {
         if ( MarkerQueueContainer == null ) {
-            return;
+            return; // TODO: create one rather than return?
         }
         if ( Input.GetMouseButton ( 0 ) ) {
             if ( Time.time > timeSinceLastClick ) { // rate limit saftey
@@ -90,5 +94,13 @@ public class Mover : MonoBehaviour {
     IEnumerator BeginMoveAfterDelay ( float delay ) {
         yield return new WaitForSeconds ( delay );
         isMoving = true;
+    }
+
+    void CreateMarkerPool (int queuedMovesMax) {
+        for (int i = 0; i < queuedMovesMax; i++) {
+            GameObject go = Instantiate<GameObject>(QueuedMoveMarkerPrefab);
+            go.SetActive(false);
+            go.transform.SetParent(PlayerAssetContainer.s.transform);
+        }
     }
 }
