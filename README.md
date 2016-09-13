@@ -26,11 +26,12 @@ _note: load the scene titled '1' to see most of these scripts in action_
 - ChaseCamBounded.cs
 - ChaseCamElastic.cs
 - ChaseCamTethered.cs
-- Mover.cs (depends on a few other scripts though, but the dependencies can easily be substituted with whatever)
+- MoveQueue.cs
 - Oscillator.cs
 - ExtensionsFloat.cs
-- ExtensionsGameObject.cs
 - ExtensionsVector.cs
+- ExtensionsGameObject.cs
+- ExtensionsTransform.cs
 - DebugTransform.cs
 
 * * * 

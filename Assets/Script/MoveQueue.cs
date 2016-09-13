@@ -3,88 +3,62 @@ using System.Collections;
 
 public class MoveQueue : MonoBehaviour {
 
-    // has a pool of x markers
-    // markers default to available (ie, inactive)
+    public Transform  MarkerPoolTransform  = null;
+    public GameObject MoveMarkerPrefab     = null;
+    public GameObject QueueMarkerPrefab    = null;
+    public int        QueueBufferCapacity  = 10;
+    public float       MoveSpeedMultiplier  = 5.0f;
+    public float       MoveDelay            = 0.35f;
+    public float       RateLimitInterval    = 0.25f;
 
-    // on each update we:
-    // start by checking:
-    //      any moves left to execute? (ie, active markers)
-    //      if yes:
-    //          set target position to the next active marker
-    //      if no:
-    //          wait for a mouse click
-    // if the mouse is clicked check:
-    //      are we currently executing a move?
-    //      if yes:
-    //          do we have an available marker? (ie, inactive) <- Call GetNextAvailableMove
-    //          if yes:
-    //              take the next available marker and set as active
-    //          if no:
-    //              that means we have moves to finish
-    //      if no:
-    //          we can move to the click position
+    MoveController2D  mc                   = new MoveController2D ();
+    GameObject        moveMarker           = null;
+    GameObject        currentMove          = null;
+    float              timeSinceLastClicked = 0.0f;
+    bool              isExecutingMove      = false;
 
-    public Transform MarkerPoolTransform = null;
-    public Transform MarkerQueueTransform = null;
-    public GameObject MoveMarkerPrefab = null;
-    public GameObject QueueMarkerPrefab = null;
-    public int QueueBufferCapacity = 10;
-    public float MoveSpeedMultiplier = 5.0f;
-    public float MoveDelay = 0.15f;
-    public float RateLimitInterval = 0.5f;
-
-    MoveController2D mc = new MoveController2D ();
-    Vector3 targetMove = Vector3.zero;
-    float timeSinceLastClicked = 0.0f;
-    bool isExecutingMove = false;
-    bool hasMove = false;
-
-    Transform moverTransform { get { return gameObject.transform; } }
-    float setLastClickTime { get { return Time.time + RateLimitInterval; } }
-    float t { get { return Time.time; } }
-    float dt { get { return Time.deltaTime; } }
+    Transform         moverTransform       { get { return gameObject.transform; } }
+    float              setLastClickTime     { get { return Time.time + RateLimitInterval; } }
 
     void Start () {
         InitialiseMarkerPool ();
     }
 
-    void Update () {
-        Debug.Log(hasMove + "\n" + isExecutingMove);
-        if ( hasMove == false ) {
-            GameObject move = GetNextMoveToExecute (); // returns an active move marker
-            if ( move != null ) {
-                targetMove = move.transform.position;
-                hasMove = true;
-                move.SetActive(false);
-            }
+    void Update () { // TODO: use a linked-list instead of for-loops
+        GameObject move = GetNextActive ();
+        if ( move != null && isExecutingMove == false ) {
+            currentMove = move;
         }
         if ( Input.GetMouseButton ( 0 ) ) {
-            if ( Time.time > timeSinceLastClicked ) {
+            if ( Time.time > timeSinceLastClicked ) { // rate-limiting
                 timeSinceLastClicked = setLastClickTime;
-                Vector3 mousePos = MousePointer.Pos();
+                Vector3 mousePos = MousePointer.Pos ();
                 if ( isExecutingMove ) {
-                    GameObject queuedMove = GetNextAvailableMove ();
+                    GameObject queuedMove = GetNextInactive ();
                     if ( queuedMove != null ) {
                         queuedMove.transform.position = mousePos;
-                        queuedMove.SetActive(true);
+                        queuedMove.transform.SetAsLastSibling ();
+                        queuedMove.SetActive ( true );
                     }
-                } else if (isExecutingMove == false && hasMove == false) {
-                    targetMove = mousePos;
+                } else if ( isExecutingMove == false ) {
+                    currentMove = MoveMarkerToCurrentMove ( mousePos );
                     StartCoroutine ( SetMoveFlagAfterDelay ( MoveDelay ) );
                 }
             }
         }
-        if (isExecutingMove && hasMove) {
-            if ( mc.MoveUntilArrived(moverTransform, targetMove, MoveSpeedMultiplier, dt ) ) {
-                GameObject queuedMove = GetNextMoveToExecute();
+        if ( isExecutingMove ) {
+            if ( mc.MoveUntilArrived(moverTransform, currentMove.transform.position, MoveSpeedMultiplier, Time.deltaTime ) ) {
+                currentMove.SetActive ( false );
+                GameObject queuedMove = GetNextActive ();
                 if ( queuedMove != null ) {
-                    targetMove = queuedMove.transform.position;
+                    currentMove = MoveMarkerToCurrentMove ( queuedMove.transform.position );
+                    queuedMove.SetActive ( false );
+                    StartCoroutine ( SetMoveFlagAfterDelay ( MoveDelay ) );
                 } else {
-                    hasMove = false;
                     isExecutingMove = false;
                 }
             }
-            mc.RotateUntilFacingTarget ( moverTransform, targetMove );
+            mc.RotateUntilFacingTarget ( moverTransform, currentMove.transform.position );
         }
     }
 
@@ -96,20 +70,29 @@ public class MoveQueue : MonoBehaviour {
         }
     }
 
-    GameObject GetNextMoveToExecute () {
-        for (int i = 0; i < MarkerPoolTransform.childCount; i++) {
-            GameObject curr = MarkerPoolTransform.GetChild(i).gameObject;
-            if (curr.activeInHierarchy) {
+    GameObject MoveMarkerToCurrentMove ( Vector3 position ) {
+        if ( moveMarker == null ) {
+            moveMarker = Instantiate<GameObject> ( MoveMarkerPrefab );
+        }
+        moveMarker.transform.position = position;
+        moveMarker.SetActive ( true );
+        return moveMarker;
+    }
+
+    GameObject GetNextActive () {
+        for ( int i = 0; i < MarkerPoolTransform.childCount; i++ ) {
+            GameObject curr = MarkerPoolTransform.GetChild ( i ).gameObject;
+            if ( curr.activeInHierarchy ) {
                 return curr;
             }
         }
         return null;
     }
 
-    GameObject GetNextAvailableMove () {
-        for (int i = 0; i < MarkerPoolTransform.childCount; i++) {
-            GameObject curr = MarkerPoolTransform.GetChild(i).gameObject;
-            if (curr.activeInHierarchy == false) {
+    GameObject GetNextInactive () {
+        for ( int i = 0; i < MarkerPoolTransform.childCount; i++ ) {
+            GameObject curr = MarkerPoolTransform.GetChild ( i ).gameObject;
+            if ( curr.activeInHierarchy == false ) {
                 return curr;
             }
         }
@@ -118,7 +101,6 @@ public class MoveQueue : MonoBehaviour {
 
     IEnumerator SetMoveFlagAfterDelay ( float delay ) {
         yield return new WaitForSeconds ( delay );
-        hasMove = true;
         isExecutingMove = true;
     }
 }

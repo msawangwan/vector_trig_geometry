@@ -107,13 +107,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MarkerPoolTransform: {fileID: 447268856}
-  MarkerQueueTransform: {fileID: 1157817778}
   MoveMarkerPrefab: {fileID: 1000012909692080, guid: 0ea95d598d76deb419a253db1d733a02,
     type: 2}
   QueueMarkerPrefab: {fileID: 1000012881212204, guid: f85885faba22a694e84df34d7d63a4c2,
     type: 2}
   QueueBufferCapacity: 10
-  RateLimitInterval: 0.5
+  MoveSpeedMultiplier: 5
+  MoveDelay: 0.15
+  RateLimitInterval: 0.25
 --- !u!1001 &343446532
 Prefab:
   m_ObjectHideFlags: 0
