@@ -36,7 +36,6 @@ public class MoveQueue : MonoBehaviour {
     MoveController2D mc = new MoveController2D ();
     Vector3 targetMove = Vector3.zero;
     float timeSinceLastClicked = 0.0f;
-    bool shouldExecuteMove = false;
     bool isExecutingMove = false;
     bool hasMove = false;
 
@@ -50,29 +49,42 @@ public class MoveQueue : MonoBehaviour {
     }
 
     void Update () {
+        Debug.Log(hasMove + "\n" + isExecutingMove);
         if ( hasMove == false ) {
             GameObject move = GetNextMoveToExecute (); // returns an active move marker
             if ( move != null ) {
                 targetMove = move.transform.position;
                 hasMove = true;
+                move.SetActive(false);
             }
         }
         if ( Input.GetMouseButton ( 0 ) ) {
             if ( Time.time > timeSinceLastClicked ) {
                 timeSinceLastClicked = setLastClickTime;
+                Vector3 mousePos = MousePointer.Pos();
                 if ( isExecutingMove ) {
                     GameObject queuedMove = GetNextAvailableMove ();
                     if ( queuedMove != null ) {
+                        queuedMove.transform.position = mousePos;
                         queuedMove.SetActive(true);
                     }
-                } else if (shouldExecuteMove == false && hasMove == false) {
-                    targetMove = MousePointer.Pos();
+                } else if (isExecutingMove == false && hasMove == false) {
+                    targetMove = mousePos;
                     StartCoroutine ( SetMoveFlagAfterDelay ( MoveDelay ) );
                 }
             }
         }
-        if (shouldExecuteMove && hasMove) {
-            shouldExecuteMove = false;
+        if (isExecutingMove && hasMove) {
+            if ( mc.MoveUntilArrived(moverTransform, targetMove, MoveSpeedMultiplier, dt ) ) {
+                GameObject queuedMove = GetNextMoveToExecute();
+                if ( queuedMove != null ) {
+                    targetMove = queuedMove.transform.position;
+                } else {
+                    hasMove = false;
+                    isExecutingMove = false;
+                }
+            }
+            mc.RotateUntilFacingTarget ( moverTransform, targetMove );
         }
     }
 
@@ -106,6 +118,7 @@ public class MoveQueue : MonoBehaviour {
 
     IEnumerator SetMoveFlagAfterDelay ( float delay ) {
         yield return new WaitForSeconds ( delay );
-        shouldExecuteMove = true;
+        hasMove = true;
+        isExecutingMove = true;
     }
 }
