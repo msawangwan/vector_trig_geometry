@@ -1,10 +1,21 @@
 ﻿using UnityEngine;
 
-public class MoveController2D {
+    /*
+    ===
+    ==
+        a 2D move controller that exposes two public functions:
+
+            - MoveUntilArrived() <- moves a transform from a to b
+            - RotateUntilFacingTarget() <- rotates a transform to point its 'up' at a target
+        
+        both return TRUE to signal completion of the associated action.
+    ==
+    ===
+    */
+
+public class MoveController {
 
     public enum InputType { none = 0, mouse = 1 } // TODO: implement
-
-    public MoveController2D () {}
 
     public bool MoveUntilArrived (Transform myTransform, Vector3 target, float speed, float dt) {
         Vector3 curr = myTransform.position;
@@ -23,15 +34,16 @@ public class MoveController2D {
     }
 
     public bool RotateUntilFacingTarget (Transform myTransform, Vector3 target) {
-        myTransform.rotation = GetRotation(myTransform.position, target);
-        return true;
-    }
-
-    Quaternion GetRotation ( Vector3 facing, Vector3 target ) {
-        Vector3 heading = (target - facing).normalized;
+        Vector3 heading = (target - myTransform.position).normalized;
         float theta = Mathf.Acos ( Vector3.Dot ( Vector3.right, heading ) ) * Mathf.Rad2Deg;
-
-        if ( heading.y < 0 ) return Quaternion.Euler ( 0f, 0f, 270f - theta ); 
-        else return Quaternion.Euler ( 0f, 0f, theta - 90f );
+        Quaternion rot = Quaternion.identity;
+        if ( heading.y < 0 ){ 
+            rot = Quaternion.Euler ( 0f, 0f, 270f - theta ); 
+        }
+        else {
+            rot = Quaternion.Euler ( 0f, 0f, theta - 90f );
+        }
+        myTransform.rotation = rot;
+        return true;
     }
 }

@@ -53,9 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e473ee5d9aa5fb04db165d0c47dce939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveMarkerPrefab: {fileID: 1000011354290424, guid: f216207e8c93d4e66a35367c2549ec62,
-    type: 2}
-  speedMultiplier: 5
+  MoveSpeed: 10
 --- !u!114 &114000010497712184
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -67,7 +65,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7c5cfed4f234ba4882c6e40d1d78634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPlayerController: 0
+  IsPlayerController: 1
 --- !u!212 &212000014011870546
 SpriteRenderer:
   m_ObjectHideFlags: 1

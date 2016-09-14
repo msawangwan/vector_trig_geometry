@@ -9,31 +9,31 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1000011354290424}
+  m_RootGameObject: {fileID: 1000012881212204}
   m_IsPrefabParent: 1
---- !u!1 &1000011354290424
+--- !u!1 &1000012881212204
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 4000011887667800}
-  - 212: {fileID: 212000012146024698}
-  - 114: {fileID: 114000013580049788}
+  - 4: {fileID: 4000014032649014}
+  - 212: {fileID: 212000011676527658}
+  - 95: {fileID: 95000010777923298}
   m_Layer: 0
-  m_Name: yellow_dot
+  m_Name: move_marker-queued
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4000011887667800
+--- !u!4 &4000014032649014
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000011354290424}
+  m_GameObject: {fileID: 1000012881212204}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -41,23 +41,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
---- !u!114 &114000013580049788
-MonoBehaviour:
+--- !u!95 &95000010777923298
+Animator:
+  serializedVersion: 3
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000011354290424}
+  m_GameObject: {fileID: 1000012881212204}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d96f3b4bcdf5428ea2c0b25a52bc6a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!212 &212000012146024698
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 3dfa0e8530037334987b995296b680b8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+--- !u!212 &212000011676527658
 SpriteRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000011354290424}
+  m_GameObject: {fileID: 1000012881212204}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -81,7 +87,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300002, guid: fc684da46177c0247a015752c6586917, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bc397d93aeeda764d9956167420cd823, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

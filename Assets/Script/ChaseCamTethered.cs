@@ -17,6 +17,8 @@
 
 public class ChaseCamTethered : MonoBehaviour {
 
+	// TODO: look into the concept of a 'camera rig'
+
     [TooltipAttribute("~ set in editor -- this is the target the camera will chase")]
     public Transform ChaseTarget;
 

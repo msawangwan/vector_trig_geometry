@@ -10,6 +10,8 @@ chase a target if the target enters a buffer area defined as zones along the edg
 
 public class ChaseCamBounded : MonoBehaviour {
 
+	// TODO: look into the concept of a 'camera rig'
+
 	[TooltipAttribute ( "~ set in editor -- this is the target the camera will chase" )]
 	public Transform ChaseTarget = null;
 

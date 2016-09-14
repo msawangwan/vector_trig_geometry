@@ -3,7 +3,7 @@
 public class AutoAgentAI : AutoAgent {
 	public float ms = 5.0f;
 	Transform target = null;
-	MoveController2D mc = new MoveController2D ();
+	MoveController mc = new MoveController ();
     bool hasTarget = false;
 
     void Update () {
