@@ -21,7 +21,7 @@
 
 #### To save you the time of combing through the code to find the working bits, The following is an evolving list of working scripts that someone may find useful:
 
-_note: load the scene titled '1' to see most of these scripts in action_
+_note: load the scene titled '1' to see most of these scripts in action (currently in a semi-broken state)_
 
 - ChaseCamBounded.cs
 - ChaseCamElastic.cs
@@ -34,7 +34,7 @@ _note: load the scene titled '1' to see most of these scripts in action_
 - ExtensionsTransform.cs
 - DebugTransform.cs
 
-* * * 
+* * *
 
 ## Attribution
 
