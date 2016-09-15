@@ -105,68 +105,12 @@ Extract-Min aka Head- O(1)
         }
     }
 
-    public IEnumerable MoveEnumerable ( Vector3 targetPosition ) {
-        if ( Time.time > timeSinceLastClicked ) { // rate-limiting
-            timeSinceLastClicked = setLastClickTime;
-            if ( isExecutingMove ) {
-                GameObject queuedMove = GetNextInactive ();
-                if ( queuedMove != null ) {
-                    queuedMove.transform.position = targetPosition;
-                    queuedMove.transform.SetAsLastSibling ();
-                    queuedMove.SetActive ( true );
-                }
-            } else {
-                currentMove = MoveMarkerToCurrentMove ( targetPosition );
-                yield return SetMoveFlagAfterDelay ( MoveDelay );
-            }
-        }
-        yield return null;
-    }
-
-    public void RaiseMoveQueryEvent ( Vector3 targetPosition ) {
-        if ( Time.time > timeSinceLastClicked ) { // rate-limiting
-            timeSinceLastClicked = setLastClickTime;
-            if ( isExecutingMove ) {
-                GameObject queuedMove = GetNextInactive ();
-                if ( queuedMove != null ) {
-                    queuedMove.transform.position = targetPosition;
-                    queuedMove.transform.SetAsLastSibling ();
-                    queuedMove.SetActive ( true );
-                }
-            } else {
-                currentMove = MoveMarkerToCurrentMove ( targetPosition );
-                StartCoroutine ( SetMoveFlagAfterDelay ( MoveDelay ) );
-            }
-        }
-    }
-
-    public void RaiseMoveComplete ( bool hasCompletedMove ) {
-        if ( isExecutingMove ) {
-            if ( hasCompletedMove ) {
-                currentMove.SetActive ( false );
-                GameObject queuedMove = GetNextActive ();
-                if ( queuedMove != null ) {
-                    currentMove = MoveMarkerToCurrentMove ( queuedMove.transform.position );
-                    queuedMove.SetActive ( false );
-                    StartCoroutine ( SetMoveFlagAfterDelay ( MoveDelay ) );
-                } else {
-                    isExecutingMove = false;
-                }
-            }
-        }
-    }
-
-    public Vector3 GetMoveToTarget ( Vector3 currentPosition ) {
-        Vector3 target = Vector3.zero;
-        return Vector3.zero;
-    }
-
     void Disabled_Start () {
         InitialiseMarkerPool ();
     }
 
     void Disabled_Update () { // TODO: use a linked-list instead of for-loops
-        GameObject move = GetNextActive ();
+        GameObject move = MarkerPoolTransform.GetNextActive ();
         if ( move != null && isExecutingMove == false ) {
             currentMove = move;
         }
@@ -175,7 +119,7 @@ Extract-Min aka Head- O(1)
                 timeSinceLastClicked = setLastClickTime;
                 Vector3 mousePos = MousePointer.Pos ();
                 if ( isExecutingMove ) {
-                    GameObject queuedMove = GetNextInactive ();
+                    GameObject queuedMove = MarkerPoolTransform.GetNextInactive ();
                     if ( queuedMove != null ) {
                         queuedMove.transform.position = mousePos;
                         queuedMove.transform.SetAsLastSibling ();
@@ -190,7 +134,7 @@ Extract-Min aka Head- O(1)
         if ( isExecutingMove ) {
             if ( mc.MoveUntilArrived ( moverTransform, currentMove.transform.position, MoveSpeedMultiplier, Time.deltaTime ) ) {
                 currentMove.SetActive ( false );
-                GameObject queuedMove = GetNextActive ();
+                GameObject queuedMove = MarkerPoolTransform.GetNextActive ();
                 if ( queuedMove != null ) {
                     currentMove = MoveMarkerToCurrentMove ( queuedMove.transform.position );
                     queuedMove.SetActive ( false );
@@ -218,26 +162,6 @@ Extract-Min aka Head- O(1)
         moveMarker.transform.position = position;
         moveMarker.SetActive ( true );
         return moveMarker;
-    }
-
-    GameObject GetNextActive () {
-        for ( int i = 0; i < MarkerPoolTransform.childCount; i++ ) {
-            GameObject curr = MarkerPoolTransform.GetChild ( i ).gameObject;
-            if ( curr.activeInHierarchy ) {
-                return curr;
-            }
-        }
-        return null;
-    }
-
-    GameObject GetNextInactive () {
-        for ( int i = 0; i < MarkerPoolTransform.childCount; i++ ) {
-            GameObject curr = MarkerPoolTransform.GetChild ( i ).gameObject;
-            if ( curr.activeInHierarchy == false ) {
-                return curr;
-            }
-        }
-        return null;
     }
 
     IEnumerator SetMoveFlagAfterDelay ( float delay ) {

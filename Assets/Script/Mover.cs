@@ -32,7 +32,7 @@ public class Mover : MonoBehaviour {
 
         if ( mouseClick_L ) {
             targetPosition = MousePointer.Pos();
-            QueuedMoves.RaiseMoveQueryEvent (targetPosition);
+            //QueuedMoves.RaiseMoveQueryEvent (targetPosition);
             shouldMove = true;
         }
         if ( shouldMove ) {
