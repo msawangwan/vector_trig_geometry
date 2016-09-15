@@ -12,21 +12,24 @@ using System.Collections;
 public class MoveQueue : MonoBehaviour {
 
     public class Move {
-        public static int totalActiveCount = 0;
 
-        public Move       Next            { get; private set; }
-        public Move       Previous        { get; private set; }
+        public static int TotalActiveCount { get; set; }
+        public int        Priority         { get; set; }
 
-        public int        Priority        { get; set; }
+        public Move       Next             { get; private set; }
+        public Move       Previous         { get; private set; }
 
-        public GameObject MarkerObject    { get; private set;}
-        public Transform  MarkerTransform { get { return MarkerObject.transform; } }
-        public Vector3    Position        { get { return MarkerObject.transform.position; } }
+        public GameObject MarkerObject     { get; private set;}
+        public Transform  MarkerTransform  { get { return MarkerObject.transform; } }
+        public Vector3    Position         { get { return MarkerObject.transform.position; } }
 
-        public Move ( Move next, Move previous, GameObject markerObject ) {
+        public Move () {}
+
+        public Move ( Move next, Move previous, GameObject markerObject, int priority ) {
             Next = next;
             Previous = previous;
             MarkerObject = markerObject;
+            Priority = priority;
         }
     }
 
@@ -76,32 +79,31 @@ Extract-Min aka Head- O(1)
 
     /* WIP min-heap implementation */
     const int maxBufferSize = 10;
-    const int idFirst = 0;
-    const int idInactive = maxBufferSize * 100; // can not be a valid ID, represents the id/priority of an inactive move
-    
-    public static int numMovesActive = 0;
+    const int indexFirst = 0;
+    const int indexInactive = maxBufferSize * 100; // can not be a valid ID, represents the id/priority of an inactive move
+    const int indexSwap = maxBufferSize + 1;
 
     public MoveQueue.Move Head = null;
     public MoveQueue.Move Tail = null;
 
-    public int ActiveCount { get { return numMovesActive; } }
+    public int ActiveCount { get { return Head.TotalActiveCount; } }
 
-    public void Enqueue ( MoveQueue.Move m ) {
-        //int leftChild = numMovesActive;
+    public void Enqueue ( Vector3 movePosition ) {
+        MoveQueue.Move move  = new MoveQueue.Move();
         int leftChild = MarkerPoolTransform.ChildCountActive () - 1;
         while (leftChild > 0) {
             int parent = (leftChild - 1) / 2;
-            Move priorityLeft = MarkerPoolTransform.GetChild (leftChild).gameObject.GetComponent <Move>();
-            Move parentPriority = MarkerPoolTransform.GetChild (parent).gameObject.GetComponent <Move>();
-            if (priorityLeft.Priority > parentPriority.Priority) {
+            MoveQueue.Move priorityLeft = MarkerPoolTransform.GetChild (leftChild).gameObject.GetComponent <Move>();
+            MoveQueue.Move priorityParent = MarkerPoolTransform.GetChild (parent).gameObject.GetComponent <Move>();
+            if (priorityLeft.Priority > priorityParent.Priority) {
                 break;
             }
-
-
+            priorityParent.SetSiblingIndex(indexSwap);
+            priorityLeft.SetSiblingIndex(parent);
+            priorityParent.SetSiblineIndex(leftChild);
+            leftChild = parent;
         }
     }
-
-
 
     public IEnumerable MoveEnumerable ( Vector3 targetPosition ) {
         if ( Time.time > timeSinceLastClicked ) { // rate-limiting
