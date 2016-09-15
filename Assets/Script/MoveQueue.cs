@@ -11,6 +11,25 @@ using System.Collections;
 
 public class MoveQueue : MonoBehaviour {
 
+    public class Move {
+        public static int totalActiveCount = 0;
+
+        public Move       Next            { get; private set; }
+        public Move       Previous        { get; private set; }
+
+        public int        Priority        { get; set; }
+
+        public GameObject MarkerObject    { get; private set;}
+        public Transform  MarkerTransform { get { return MarkerObject.transform; } }
+        public Vector3    Position        { get { return MarkerObject.transform.position; } }
+
+        public Move ( Move next, Move previous, GameObject markerObject ) {
+            Next = next;
+            Previous = previous;
+            MarkerObject = markerObject;
+        }
+    }
+
     /* references */
     [TooltipAttribute ( "~ the parent container for the marker pool and move queue-- warning: do NOT use a gameobject that changes position, use either the object this script is attached to or an empty gameobject" )]
     public Transform   MarkerPoolTransform  = null;
@@ -43,6 +62,64 @@ public class MoveQueue : MonoBehaviour {
     /* local properties */
     Transform          moverTransform       { get { return gameObject.transform; } }
     float              setLastClickTime     { get { return Time.time + RateLimitInterval; } }
+
+/* Priority Queque using the Min-Heap invariant:
+ - Uses a fixed-size array (for speed)
+ - Index starts at 1 not 0
+ - Left Child node is at [2 * i], if available
+ - Right Child node is at [2 * i + 1], if available
+ - Parent node is at [i / 2], if available
+Insert aka Enqueue -- O(logn)
+Remove aka Dequeue -- O(logn)
+Extract-Min aka Head- O(1)
+ - Contains() ---------- O(1) */
+
+    /* WIP min-heap implementation */
+    const int maxBufferSize = 10;
+    const int idFirst = 0;
+    const int idInactive = maxBufferSize * 100; // can not be a valid ID, represents the id/priority of an inactive move
+    
+    public static int numMovesActive = 0;
+
+    public MoveQueue.Move Head = null;
+    public MoveQueue.Move Tail = null;
+
+    public int ActiveCount { get { return numMovesActive; } }
+
+    public void Enqueue ( MoveQueue.Move m ) {
+        //int leftChild = numMovesActive;
+        int leftChild = MarkerPoolTransform.ChildCountActive () - 1;
+        while (leftChild > 0) {
+            int parent = (leftChild - 1) / 2;
+            Move priorityLeft = MarkerPoolTransform.GetChild (leftChild).gameObject.GetComponent <Move>();
+            Move parentPriority = MarkerPoolTransform.GetChild (parent).gameObject.GetComponent <Move>();
+            if (priorityLeft.Priority > parentPriority.Priority) {
+                break;
+            }
+
+
+        }
+    }
+
+
+
+    public IEnumerable MoveEnumerable ( Vector3 targetPosition ) {
+        if ( Time.time > timeSinceLastClicked ) { // rate-limiting
+            timeSinceLastClicked = setLastClickTime;
+            if ( isExecutingMove ) {
+                GameObject queuedMove = GetNextInactive ();
+                if ( queuedMove != null ) {
+                    queuedMove.transform.position = targetPosition;
+                    queuedMove.transform.SetAsLastSibling ();
+                    queuedMove.SetActive ( true );
+                }
+            } else {
+                currentMove = MoveMarkerToCurrentMove ( targetPosition );
+                yield return SetMoveFlagAfterDelay ( MoveDelay );
+            }
+        }
+        yield return null;
+    }
 
     public void RaiseMoveQueryEvent ( Vector3 targetPosition ) {
         if ( Time.time > timeSinceLastClicked ) { // rate-limiting

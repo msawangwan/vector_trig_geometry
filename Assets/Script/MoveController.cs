@@ -5,8 +5,8 @@
     ==
         a 2D move controller that exposes two public functions:
 
-            - MoveUntilArrived() <- moves a transform from a to b
-            - RotateUntilFacingTarget() <- rotates a transform to point its 'up' at a target
+            - MoveUntilArrived()
+            - RotateUntilFacingTarget()
         
         both return TRUE to signal completion of the associated action.
     ==
@@ -17,6 +17,7 @@ public class MoveController {
 
     public enum InputType { none = 0, mouse = 1 } // TODO: implement
 
+    /* this is a re-implemented Vector.MoveTowards() */
     public bool MoveUntilArrived (Transform myTransform, Vector3 target, float speed, float dt) {
         Vector3 curr = myTransform.position;
         Vector3 remaining = target - curr;
@@ -33,6 +34,7 @@ public class MoveController {
         return true;
     }
 
+    /* can simply use Mathf.Atan2 instead of checking the sign of Mathf.Acos() -- which is better?  */
     public bool RotateUntilFacingTarget (Transform myTransform, Vector3 target) {
         Vector3 heading = (target - myTransform.position).normalized;
         float theta = Mathf.Acos ( Vector3.Dot ( Vector3.right, heading ) ) * Mathf.Rad2Deg;

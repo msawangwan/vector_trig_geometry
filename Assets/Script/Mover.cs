@@ -29,8 +29,10 @@ public class Mover : MonoBehaviour {
             Debug.LogError ( "mover has no move queue!", gameObject );
             return;
         }
+
         if ( mouseClick_L ) {
             targetPosition = MousePointer.Pos();
+            QueuedMoves.RaiseMoveQueryEvent (targetPosition);
             shouldMove = true;
         }
         if ( shouldMove ) {

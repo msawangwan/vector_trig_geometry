@@ -27,6 +27,7 @@ _note: load the scene titled '1' to see most of these scripts in action (current
 - ChaseCamElastic.cs
 - ChaseCamTethered.cs
 - MoveQueue.cs
+- MoveController.cs
 - Oscillator.cs
 - ExtensionsFloat.cs
 - ExtensionsVector.cs
