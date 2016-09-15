@@ -17,12 +17,19 @@ public class Mover : MonoBehaviour {
     public MoveQueue QueuedMoves = null;
     public float MoveSpeed = 10.0f;
 
+    MoveQueue.Move currentMove = null;
     MoveController mc = new MoveController ();
     Vector3 targetPosition = Vector3.zero;
     bool shouldMove = false;
 
     Transform moverTransform { get { return gameObject.transform; } }
     bool mouseClick_L { get { return Input.GetMouseButton ( 0 ); } }
+
+    void Start () {
+        QueuedMoves.CreateNewMoveQueuePool ();
+        QueuedMoves.Identifier = gameObject.name;
+        Debug.Log(QueuedMoves.Identifier);
+    }
 
     void Update () {
         if ( QueuedMoves == null ) {
@@ -32,11 +39,12 @@ public class Mover : MonoBehaviour {
 
         if ( mouseClick_L ) {
             targetPosition = MousePointer.Pos();
-            //QueuedMoves.RaiseMoveQueryEvent (targetPosition);
+            //MoveQueue.Move move = QueuedMoves.DequeueNextMove(targetPosition);
+            //QueuedMoves.EnqueueMove (null);
             shouldMove = true;
         }
         if ( shouldMove ) {
-            if ( mc.MoveUntilArrived ( moverTransform, targetPosition, MoveSpeed, Time.deltaTime ) ) {
+            if ( mc.MoveUntilArrived ( moverTransform, targetPosition, MoveSpeed ) ) {
                 shouldMove = false;
             }
             mc.RotateUntilFacingTarget ( moverTransform, targetPosition );

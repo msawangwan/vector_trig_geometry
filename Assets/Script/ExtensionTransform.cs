@@ -2,15 +2,15 @@
 
 public static class ExtensionTransform {
 
-    public static GameObject GetNext ( this Transform t ) {
+    public static GameObject GetNextSibling ( this Transform t ) {
         return t.parent.GetChild ( t.GetSiblingIndex () + 1 ).gameObject;
     }
 
-    public static GameObject GetPrevious ( this Transform t ) {
+    public static GameObject GetPreviousSibling ( this Transform t ) {
         return t.parent.GetChild ( t.GetSiblingIndex () - 1 ).gameObject;
     }
 
-    public static GameObject GetNextActive ( this Transform t ) {
+    public static GameObject GetNextActiveSibling ( this Transform t ) {
         for ( int i = 0; i < t.childCount; i++ ) {
             GameObject curr = t.GetChild ( i ).gameObject;
             if ( curr.activeInHierarchy ) {
@@ -20,7 +20,7 @@ public static class ExtensionTransform {
         return null;
     }
 
-    public static GameObject GetNextInactive ( this Transform t ) {
+    public static GameObject GetNextInactiveSibling ( this Transform t ) {
         for ( int i = 0; i < t.childCount; i++ ) {
             GameObject curr = t.GetChild ( i ).gameObject;
             if ( curr.activeInHierarchy == false ) {
@@ -28,6 +28,34 @@ public static class ExtensionTransform {
             }
         }
         return null;
+    }
+
+    public static int GetNextSiblingIndex ( this Transform t ) {
+        return t.GetSiblingIndex () + 1;
+    }
+
+    public static int GetPreviousSiblingIndex ( this Transform t ) {
+        return t.GetSiblingIndex () - 1; // warning: caller must verify index > 0
+    }
+
+    public static int GetNextActiveSiblingIndex ( this Transform t ) {
+        for ( int i = 0; i < t.childCount; i++ ) {
+            Transform curr = t.GetChild ( i );
+            if ( curr.gameObject.activeInHierarchy ) {
+                return t.GetSiblingIndex ();
+            }
+        }
+        return -1; // warning: caller must verify index > 0
+    }
+
+    public static int GetNextInactiveSiblingIndex ( this Transform t ) {
+        for ( int i = 0; i < t.childCount; i++ ) {
+            Transform curr = t.GetChild ( i );
+            if ( curr.gameObject.activeInHierarchy == false ) {
+                return curr.GetSiblingIndex ();
+            }
+        }
+        return -1; // warning: caller must verify index > 0
     }
 
     /* returns a Transform child count of either active (default) or inactive objects */
@@ -54,5 +82,27 @@ public static class ExtensionTransform {
             break;
         }
         return count;
+    }
+
+    /* wrapper method */
+    public static Transform InstantiateTransform ( this Transform t, string name = "transform_instance" ) {
+        return new GameObject ( name ).transform;
+    }
+
+    /* wrapper method */
+    public static Transform InstantiateTransformAtPosition ( this Transform t, Vector3 position, string name = "transform_instance" ) {
+        Transform instance = new GameObject ( name ).transform;
+        instance.position = position;
+        instance.rotation = Quaternion.identity;
+        return instance;
+    }
+
+    /* wrapper method */
+    public static Transform InstantiateTransformWithParent ( this Transform t, Transform parentTransform, string name = "transform_instance" ) {
+        Transform instance = new GameObject ( name ).transform;
+        instance.parent = parentTransform;
+        instance.position = Vector3.zero;
+        instance.rotation = Quaternion.identity;
+        return instance;
     }
 }

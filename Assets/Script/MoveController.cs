@@ -18,12 +18,12 @@ public class MoveController {
     public enum InputType { none = 0, mouse = 1 } // TODO: implement
 
     /* this is a re-implemented Vector.MoveTowards() */
-    public bool MoveUntilArrived (Transform myTransform, Vector3 target, float speed, float dt) {
+    public bool MoveUntilArrived ( Transform myTransform, Vector3 target, float speed = 1.0f ) {
         Vector3 curr = myTransform.position;
         Vector3 remaining = target - curr;
         if ( remaining != Vector3.zero ) {
             float d = remaining.magnitude;
-            float maxDistDelta = speed * dt;
+            float maxDistDelta = speed * Time.deltaTime;
             if ( d < maxDistDelta || d == 0.0f ) {
                 myTransform.position = target; // how to maintain momentum?
             } else {

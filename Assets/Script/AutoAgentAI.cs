@@ -8,7 +8,7 @@ public class AutoAgentAI : AutoAgent {
 
     void Update () {
 		if (target && hasTarget) {
-			if ( mc.MoveUntilArrived(gameObject.transform, target.position, ms, Time.deltaTime)) {
+			if ( mc.MoveUntilArrived(gameObject.transform, target.position, ms)) {
                 hasTarget = false;
             }
             mc.RotateUntilFacingTarget(gameObject.transform, target.position);
