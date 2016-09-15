@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 public static class ExtensionsGameObject {
+
     public static GameObject InstantiateAtPosition ( this GameObject prefab, Vector3 position, bool isActive = true ) {
         GameObject marker = MonoBehaviour.Instantiate<GameObject>(prefab);
         marker.transform.position = position;
@@ -17,6 +18,14 @@ public static class ExtensionsGameObject {
         marker.transform.rotation = Quaternion.identity;
         marker.SetActive(isActive);
         return marker;
+    }
+
+    public static void InstantiateMultipleParentedToPool () {
+        for (int i = 0; i < QueueBufferCapacity; i++) {
+            GameObject marker = Instantiate<GameObject> ( QueueMarkerPrefab );
+            marker.SetActive ( false );
+            marker.transform.SetParent ( MarkerPoolTransform );
+        }
     }
 
     public static GameObject Closest ( this GameObject self, List<GameObject> entities ) {
