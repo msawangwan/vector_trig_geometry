@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public static class ExtensionsGameObject {
 
-    /* TODO: research how to constarin by gameobject */
+    /* TODO: research how to constarin by gameobject -- is it even possible? */
     public static GameObject InstantiateAtPosition<T> (this GameObject prefab, Vector3 position, Quaternion rotation, bool isActive = true) 
             where T : Object {
         GameObject instance = MonoBehaviour.Instantiate<GameObject>(prefab);
@@ -13,7 +13,7 @@ public static class ExtensionsGameObject {
         return instance;
     }
 
-    /* TODO: research how to constarin by gameobject */
+    /* TODO: research how to constarin by gameobject -- is it even possible? */
     public static GameObject InstantiateAtPositionWithParent<T> ( this GameObject prefab, Transform parentTransform, Vector3 position, bool isActive = true ) 
             where T : Object {
         GameObject instance = MonoBehaviour.Instantiate<GameObject>(prefab);
@@ -24,7 +24,7 @@ public static class ExtensionsGameObject {
         return instance;
     }
 
-    /* instantiates a pool of gameobjects */
+    /* instantiates a pool of gameobjects -- is it even possible? */
     public static void InstantiatePool<T> ( this GameObject prefab, Transform poolTransform, int poolSize, bool isActive = true ) 
             where T : Object {
         for (int i = 0; i < poolSize; i++) {

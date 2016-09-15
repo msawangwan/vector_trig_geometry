@@ -26,9 +26,14 @@ public class Mover : MonoBehaviour {
     bool mouseClick_L { get { return Input.GetMouseButton ( 0 ); } }
 
     void Start () {
-        QueuedMoves.CreateNewMoveQueuePool ();
-        QueuedMoves.Identifier = gameObject.name;
-        Debug.Log(QueuedMoves.Identifier);
+        Debug.LogFormat("startup");
+        if ( QueuedMoves == null ) {
+            Debug.LogError ( "mover has no move queue!", gameObject );
+        } else {
+            QueuedMoves.CreateNewMoveQueuePool ();
+            QueuedMoves.Identifier = gameObject.name;
+            Debug.Log(QueuedMoves.Identifier);
+        }
     }
 
     void Update () {

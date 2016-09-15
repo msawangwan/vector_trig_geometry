@@ -90,7 +90,8 @@ Extract-Min aka Head- O(1)
 
     public GameObject[] markers = null;
 
-    public string Identifier  { get { return Identifier; } set { Identifier = "move_queue_owned_by: " + value; } }
+    public string Identifier = "";
+    //public string Identifier  { get { return Identifier; } set { Identifier = "move_queue_owned_by: " + value; } }
     public int ActiveCount { get { return MoveQueue.Move.TotalActiveCount; } }
 
     public GameObject[] CreateNewMoveQueuePool ( bool returnAllocation = false ) {
@@ -105,6 +106,7 @@ Extract-Min aka Head- O(1)
     }
 
     public void EnqueueMove ( MoveQueue.Move move ) {
+        return;
         // call with a reference to an data reference of the move
         int leftChild = MarkerPoolTransform.ChildCountActive () - 1;
         while ( leftChild > 0 ) {
@@ -143,47 +145,9 @@ Extract-Min aka Head- O(1)
         return null;
     }
 
-    void Disabled_Update () { // TODO: use a linked-list instead of for-loops
-        GameObject move = MarkerPoolTransform.GetNextActiveSibling ();
-        if ( move != null && isExecutingMove == false ) {
-            currentMove = move;
-        }
-        if ( Input.GetMouseButton ( 0 ) ) {
-            if ( Time.time > timeSinceLastClicked ) { // rate-limiting
-                timeSinceLastClicked = setLastClickTime;
-                Vector3 mousePos = MousePointer.Pos ();
-                if ( isExecutingMove ) {
-                    GameObject queuedMove = MarkerPoolTransform.GetNextInactiveSibling ();
-                    if ( queuedMove != null ) {
-                        queuedMove.transform.position = mousePos;
-                        queuedMove.transform.SetAsLastSibling ();
-                        queuedMove.SetActive ( true );
-                    }
-                } else {
-                    currentMove = GetAndReplaceQueueMarkerWithMoveMarker ( mousePos );
-                    StartCoroutine ( SetMoveFlagAfterDelay ( MoveDelay ) );
-                }
-            }
-        }
-        if ( isExecutingMove ) {
-            if ( mc.MoveUntilArrived ( moverTransform, currentMove.transform.position, MoveSpeedMultiplier ) ) {
-                currentMove.SetActive ( false );
-                GameObject queuedMove = MarkerPoolTransform.GetNextActiveSibling ();
-                if ( queuedMove != null ) {
-                    currentMove = GetAndReplaceQueueMarkerWithMoveMarker ( queuedMove.transform.position );
-                    queuedMove.SetActive ( false );
-                    StartCoroutine ( SetMoveFlagAfterDelay ( MoveDelay ) );
-                } else {
-                    isExecutingMove = false;
-                }
-            }
-            mc.RotateUntilFacingTarget ( moverTransform, currentMove.transform.position );
-        }
-    }
-
     void InitialiseSubPoolContainerTransforms () {
-        if ( VerifySubpoolInvariant () == false ) {
-            Debug.LogFormat ( gameObject, "instantiating subpool transforms for queue pool: {0}", MarkerPoolTransform.name );
+        if ( AreSubPoolsInstantiated () == false ) {
+            //Debug.LogFormat ( gameObject, "instantiating subpool transforms for queue pool: {0}", MarkerPoolTransform.name );
             poolActive.InstantiateTransformWithParent(MarkerPoolTransform, "move_pool-active");
             poolInactve.InstantiateTransformWithParent(MarkerPoolTransform, "move_pool-inactive");
         }
@@ -203,7 +167,7 @@ Extract-Min aka Head- O(1)
         isExecutingMove = true;
     }
 
-    bool VerifySubpoolInvariant () {
-        return poolActive != null && poolInactve != null;
+    bool AreSubPoolsInstantiated () {
+        return poolActive == null && poolInactve == null;
     }
 }
