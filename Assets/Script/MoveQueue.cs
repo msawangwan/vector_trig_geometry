@@ -57,8 +57,8 @@ public class MoveQueue : MonoBehaviour {
 
     /* local variables */
     MoveController     mc                   = new MoveController ();
-    Transform poolActive                    = null;
-    Transform poolInactve                   = null;
+    Transform          markerSubpoolActive                    = null;
+    Transform          markerSubpoolInactive                   = null;
     GameObject         moveMarker           = null;
     GameObject         currentMove          = null;
     float              timeSinceLastClicked = 0.0f;
@@ -83,24 +83,28 @@ Extract-Min aka Head- O(1)
     const int maxBufferSize = 10;
     const int indexFirst = 0;
     const int indexInactive = maxBufferSize * 100; // can not be a valid ID, represents the id/priority of an inactive move
-    const int indexSwap = maxBufferSize + 1;
+    const int indexSwap = maxBufferSize + 100;
 
     public MoveQueue.Move Head = null;
     public MoveQueue.Move Tail = null;
 
     public GameObject[] markers = null;
 
-    public string MoverName  { get; private set; }
-    public int ActiveCount { get { return MoveQueue.Move.TotalActiveCount; } }
+    public string MoverName         { get; private set; }
+    public int    PoolBufferMaxSize { get; private set; }
+    public int    ActiveCount       { get { return MoveQueue.Move.TotalActiveCount; } }
 
-    public GameObject[] CreateNewMoveQueuePool ( int numPooledObjects = 1, string owner = "move_queue: un-identified_owner", bool returnAllocation = false ) {
-        InitialiseSubPoolContainerTransforms();
-        if (poolActive != null && poolInactve != null) {
+    public GameObject[] CreateNewMoveQueuePool ( int poolBufferMaxSize = 1, string owner = "move_queue: un-identified_owner", bool returnAllocation = false ) {
+        MoverName = owner;
+        PoolBufferMaxSize = poolBufferMaxSize;
+        InitialiseSubPoolContainerTransforms ( MarkerPoolTransform );
+        if (markerSubpoolActive != null && markerSubpoolInactive != null) {
             switch (returnAllocation) {
                 case true:
-                    return QueueMarkerPrefab.InstantiatePoolAlloc<GameObject>(poolInactve, maxBufferSize, false);
+                    markers = QueueMarkerPrefab.InstantiatePoolAlloc<GameObject>(markerSubpoolInactive, maxBufferSize, false);
+                    return markers;
                 default:
-                    QueueMarkerPrefab.InstantiatePool<GameObject>(poolInactve, maxBufferSize, false);
+                    QueueMarkerPrefab.InstantiatePool<GameObject>(markerSubpoolInactive, maxBufferSize, false);
                     return null;
             }
         } else { Debug.LogError ( "movequeue has no subpools for active and inactive pooled objects" ); }
@@ -145,11 +149,11 @@ Extract-Min aka Head- O(1)
         return null;
     }
 
-    void InitialiseSubPoolContainerTransforms () {
-        if ( AreSubPoolsInstantiated () == false ) {
-            Debug.LogFormat ( gameObject, "instantiating subpool transforms for queue pool: {0}", MarkerPoolTransform.name );
-            poolActive.InstantiateTransformWithParent(MarkerPoolTransform, "move_pool-active");
-            poolInactve.InstantiateTransformWithParent(MarkerPoolTransform, "move_pool-inactive");
+    void InitialiseSubPoolContainerTransforms ( Transform parent ) {
+        if ( PredicateSubpoolsAreNull () ) {
+            markerSubpoolActive = markerSubpoolActive.InstantiateTransformWithParent ( parent, "move_pool-active" );
+            markerSubpoolInactive.InstantiateTransformWithParent ( parent, "move_pool-inactive" );
+            Debug.LogFormat ( gameObject, "instantiated subpool transforms \n\t queue pool: [{0}] \n\t owned by: [{1}]", parent.name, MoverName );
         }
     }
 
@@ -167,7 +171,7 @@ Extract-Min aka Head- O(1)
         isExecutingMove = true;
     }
 
-    bool AreSubPoolsInstantiated () {
-        return poolActive == null && poolInactve == null;
+    bool PredicateSubpoolsAreNull () {
+        return markerSubpoolActive == null && markerSubpoolInactive == null;
     }
 }
