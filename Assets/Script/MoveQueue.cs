@@ -90,24 +90,24 @@ Extract-Min aka Head- O(1)
 
     public GameObject[] markers = null;
 
-    public string Identifier = "";
-    //public string Identifier  { get { return Identifier; } set { Identifier = "move_queue_owned_by: " + value; } }
+    public string MoverName  { get; private set; }
     public int ActiveCount { get { return MoveQueue.Move.TotalActiveCount; } }
 
-    public GameObject[] CreateNewMoveQueuePool ( bool returnAllocation = false ) {
+    public GameObject[] CreateNewMoveQueuePool ( int numPooledObjects = 1, string owner = "move_queue: un-identified_owner", bool returnAllocation = false ) {
         InitialiseSubPoolContainerTransforms();
-        switch (returnAllocation) {
-            case true:
-                return QueueMarkerPrefab.InstantiatePoolAlloc<GameObject>(MarkerPoolTransform, maxBufferSize, false);
-            default:
-                QueueMarkerPrefab.InstantiatePool<GameObject>(MarkerPoolTransform, maxBufferSize, false);
-                return null;
-        }
+        if (poolActive != null && poolInactve != null) {
+            switch (returnAllocation) {
+                case true:
+                    return QueueMarkerPrefab.InstantiatePoolAlloc<GameObject>(poolInactve, maxBufferSize, false);
+                default:
+                    QueueMarkerPrefab.InstantiatePool<GameObject>(poolInactve, maxBufferSize, false);
+                    return null;
+            }
+        } else { Debug.LogError ( "movequeue has no subpools for active and inactive pooled objects" ); }
+        return null;
     }
 
     public void EnqueueMove ( MoveQueue.Move move ) {
-        return;
-        // call with a reference to an data reference of the move
         int leftChild = MarkerPoolTransform.ChildCountActive () - 1;
         while ( leftChild > 0 ) {
             int parent = ( leftChild - 1 ) / 2;
@@ -147,7 +147,7 @@ Extract-Min aka Head- O(1)
 
     void InitialiseSubPoolContainerTransforms () {
         if ( AreSubPoolsInstantiated () == false ) {
-            //Debug.LogFormat ( gameObject, "instantiating subpool transforms for queue pool: {0}", MarkerPoolTransform.name );
+            Debug.LogFormat ( gameObject, "instantiating subpool transforms for queue pool: {0}", MarkerPoolTransform.name );
             poolActive.InstantiateTransformWithParent(MarkerPoolTransform, "move_pool-active");
             poolInactve.InstantiateTransformWithParent(MarkerPoolTransform, "move_pool-inactive");
         }
