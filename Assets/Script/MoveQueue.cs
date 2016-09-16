@@ -22,6 +22,7 @@ Contains() ------------ O(1) */
 
 public class MoveQueue : MonoBehaviour {
 
+    /* data container class that serves as a linked-list or queue node */
     public class Move {
         public Move       Next             { get; set; }
         public Move       Previous         { get; set; }
@@ -29,11 +30,6 @@ public class MoveQueue : MonoBehaviour {
         public GameObject MarkerObject     { get; set;}
         public Transform  MarkerTransform  { get { return MarkerObject.transform; } }
         public Vector3    Position         { get { return MarkerObject.transform.position; } }
-    }
-
-    public class LinkedMoves {
-        public MoveQueue.Move Head = null;
-        public MoveQueue.Move Tail = null;
     }
 
     /* references */
@@ -132,8 +128,7 @@ public class MoveQueue : MonoBehaviour {
     }
 
     /* a custom linked-list add operation */
-    MoveQueue.LinkedMoves LinkMoveNodes () {
-        MoveQueue.LinkedMoves link = new MoveQueue.LinkedMoves { Head = null, Tail = null };
+    void LinkMoveNodes () {
         int i = 0;
         while ( i < PoolBufferMaxSize ) {
             MoveQueue.Move pooledMove = new MoveQueue.Move ();
@@ -145,7 +140,6 @@ public class MoveQueue : MonoBehaviour {
                 Tail = Tail.Next;
             }
         }
-        return null;
     }
 
     void EnqueueMove ( MoveQueue.Move move ) {

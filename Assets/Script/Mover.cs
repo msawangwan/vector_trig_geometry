@@ -39,7 +39,7 @@ public class Mover : MonoBehaviour {
             Debug.LogFormat("status of current move: {0}", currentMove==null);
             if ( mouseClick_L && shouldMove == false ) {
                 targetPosition = MousePointer.Pos();
-                currentMove = QueuedMoves.GetNextMove(targetPosition);
+                //currentMove = QueuedMoves.GetNextMove(targetPosition);
             }
             if ( shouldMove && currentMove != null ) {
                 if ( mc.MoveUntilArrived ( moverTransform, currentMove.Position, MoveSpeed ) ) {
