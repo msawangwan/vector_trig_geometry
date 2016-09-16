@@ -27,12 +27,9 @@ public class Mover : MonoBehaviour {
     bool mouseClick_L { get { return Input.GetMouseButton ( 0 ); } }
 
     void Start () {
-        if ( QueuedMoves == null ) {
-            Debug.LogError ( "mover has no move queue!", gameObject );
-        } else {
-            QueuedMoves.CreateNewMoveQueuePool (10, gameObject.name);
-            QueuedMoves.StartMoveNow += HandleOnStartMoveNow;
-        }
+        Debug.AssertFormat ( QueuedMoves != null, "{0} was not assigned a move queue!", gameObject.name );
+        QueuedMoves.CreateNewMoveQueuePool ( 10, gameObject.name );
+        QueuedMoves.StartMoveNow += HandleOnStartMoveNow;
     }
 
     void Update () {
