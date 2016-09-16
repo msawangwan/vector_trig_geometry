@@ -9,25 +9,31 @@ using System.Collections;
     ===
     */
 
+/* Priority Queque using the Min-Heap invariant:
+Uses a fixed-size array (for speed)
+Index starts at 1 not 0
+Left Child node is at [2 * i], if available
+Right Child node is at [2 * i + 1], if available
+Parent node is at [i / 2], if available
+Insert() aka Enqueue -- O(logn)
+Remove() aka Dequeue -- O(logn)
+Extract-Min() aka Head- O(1)
+Contains() ------------ O(1) */
+
 public class MoveQueue : MonoBehaviour {
 
     public class Move {
-
-        public int        Priority         { get; private set; }
-        public Move       Next             { get; private set; }
-        public Move       Previous         { get; private set; }
-        public GameObject MarkerObject     { get; private set;}
+        public Move       Next             { get; set; }
+        public Move       Previous         { get; set; }
+        public int        Priority         { get; set; }
+        public GameObject MarkerObject     { get; set;}
         public Transform  MarkerTransform  { get { return MarkerObject.transform; } }
         public Vector3    Position         { get { return MarkerObject.transform.position; } }
+    }
 
-        public Move () {}
-
-        public Move ( GameObject markerObject, int priority, Move next = null, Move previous = null ) {
-            MarkerObject = markerObject;
-            Priority = priority;
-            Next = next;
-            Previous = previous;
-        }
+    public class LinkedMoves {
+        public MoveQueue.Move Head = null;
+        public MoveQueue.Move Tail = null;
     }
 
     /* references */
@@ -64,17 +70,6 @@ public class MoveQueue : MonoBehaviour {
     /* local properties */
     Transform          moverTransform       { get { return gameObject.transform; } }
     float              setLastClickTime     { get { return Time.time + RateLimitInterval; } }
-
-/* Priority Queque using the Min-Heap invariant:
- - Uses a fixed-size array (for speed)
- - Index starts at 1 not 0
- - Left Child node is at [2 * i], if available
- - Right Child node is at [2 * i + 1], if available
- - Parent node is at [i / 2], if available
-Insert aka Enqueue -- O(logn)
-Remove aka Dequeue -- O(logn)
-Extract-Min aka Head- O(1)
- - Contains() ---------- O(1) */
 
     /* WIP min-heap implementation */
     const int maxBufferSize = 10;
@@ -123,7 +118,7 @@ Extract-Min aka Head- O(1)
             } else {
                 currentMove = GetAndReplaceQueueMarkerWithMoveMarker ( targetPosition );
                 StartCoroutine ( RaiseAfterSecondsFlagNewMoveEvent ( MoveDelay ) );
-                return new MoveQueue.Move (currentMove, indexFirst);
+                return new MoveQueue.Move { MarkerObject = currentMove, Priority = indexFirst };
             }
         }
         return null;
@@ -133,8 +128,24 @@ Extract-Min aka Head- O(1)
         if ( PredicateSubpoolsAreNull () ) {
             markerSubpoolActive = markerSubpoolActive.InstantiateTransformWithParent ( parent, "move_pool-active" );
             markerSubpoolInactive = markerSubpoolInactive.InstantiateTransformWithParent ( parent, "move_pool-inactive" );
-            Debug.LogFormat ( gameObject, "instantiated subpool transforms \n\t queue pool: [{0}] \n\t owned by: [{1}]", parent.name, MoverName );
         }
+    }
+
+    /* a custom linked-list add operation */
+    MoveQueue.LinkedMoves LinkMoveNodes () {
+        MoveQueue.LinkedMoves link = new MoveQueue.LinkedMoves { Head = null, Tail = null };
+        int i = 0;
+        while ( i < PoolBufferMaxSize ) {
+            MoveQueue.Move pooledMove = new MoveQueue.Move ();
+            if ( Head == null ) {
+                Head = pooledMove;
+                Tail = Head;
+            } else {
+                Tail.Next = pooledMove;
+                Tail = Tail.Next;
+            }
+        }
+        return null;
     }
 
     void EnqueueMove ( MoveQueue.Move move ) {
@@ -157,6 +168,10 @@ Extract-Min aka Head- O(1)
         return null;
     }
 
+    bool PredicateSubpoolsAreNull () {
+        return markerSubpoolActive == null && markerSubpoolInactive == null;
+    }
+
     GameObject GetAndReplaceQueueMarkerWithMoveMarker ( Vector3 position ) {
         if ( moveMarker == null ) {
             moveMarker = Instantiate<GameObject> ( MoveMarkerPrefab );
@@ -168,13 +183,9 @@ Extract-Min aka Head- O(1)
 
     IEnumerator RaiseAfterSecondsFlagNewMoveEvent ( float delay ) {
         yield return new WaitForSeconds ( delay );
-        if (StartMoveNow != null) {
-            StartMoveNow(true);
-        }
         isExecutingMove = true;
-    }
-
-    bool PredicateSubpoolsAreNull () {
-        return markerSubpoolActive == null && markerSubpoolInactive == null;
+        if (StartMoveNow != null) {
+            StartMoveNow(isExecutingMove);
+        }
     }
 }

@@ -36,7 +36,8 @@ public class Mover : MonoBehaviour {
 
     void Update () {
         if ( QueuedMoves ) {
-            if ( mouseClick_L ) {
+            Debug.LogFormat("status of current move: {0}", currentMove==null);
+            if ( mouseClick_L && shouldMove == false ) {
                 targetPosition = MousePointer.Pos();
                 currentMove = QueuedMoves.GetNextMove(targetPosition);
             }
@@ -52,7 +53,7 @@ public class Mover : MonoBehaviour {
     }
 
     void HandleOnStartMoveNow (bool flag) {
-        shouldMove = true;
+        shouldMove = flag;
         Debug.LogFormat("move flag changed event fired: {0}", Time.time);
     }
 }
