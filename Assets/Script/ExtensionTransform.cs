@@ -84,12 +84,12 @@ public static class ExtensionTransform {
         return count;
     }
 
-    /* wrapper method */
+    /* wrapper method -- usage: Transform t = t.InstantiateTransform() */
     public static Transform InstantiateTransform ( this Transform t, string name = "transform_instance" ) {
         return new GameObject ( name ).transform;
     }
 
-    /* wrapper method */
+    /* wrapper method -- usage: Transform t = t.InstantiateTransform(pos) */
     public static Transform InstantiateTransformAtPosition ( this Transform t, Vector3 position, string name = "transform_instance" ) {
         Transform instance = new GameObject ( name ).transform;
         instance.position = position;
@@ -97,7 +97,7 @@ public static class ExtensionTransform {
         return instance;
     }
 
-    /* wrapper method */
+    /* wrapper method -- usage: Transform t = t.InstantiateTransform(parent) */
     public static Transform InstantiateTransformWithParent ( this Transform t, Transform parentTransform, string name = "transform_instance" ) {
         Transform instance = new GameObject ( name ).transform;
         instance.parent = parentTransform;
