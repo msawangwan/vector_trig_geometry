@@ -30,6 +30,7 @@ public class Mover : MonoBehaviour {
             Debug.LogError ( "mover has no move queue!", gameObject );
         } else {
             QueuedMoves.CreateNewMoveQueuePool (10, gameObject.name);
+            QueuedMoves.LinkMoveNodes ();
             QueuedMoves.StartMoveNow += HandleOnStartMoveNow;
         }
     }

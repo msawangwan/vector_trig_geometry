@@ -73,8 +73,8 @@ public class MoveQueue : MonoBehaviour {
     const int indexInactive = maxBufferSize * 100; // can not be a valid ID, represents the id/priority of an inactive move
     const int indexSwap = maxBufferSize + 100;
 
-    public MoveQueue.Move Head = null;
-    public MoveQueue.Move Tail = null;
+    public MoveQueue.Move Head { get; private set; }
+    public MoveQueue.Move Tail { get; private set; }
 
     public event System.Action<bool> StartMoveNow;
 
@@ -128,7 +128,7 @@ public class MoveQueue : MonoBehaviour {
     }
 
     /* a custom linked-list add operation */
-    void LinkMoveNodes () {
+    public void LinkMoveNodes () {
         int i = 0;
         while ( i < PoolBufferMaxSize ) {
             MoveQueue.Move pooledMove = new MoveQueue.Move ();
