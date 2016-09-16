@@ -37,7 +37,7 @@ public static class ExtensionsGameObject {
     }
 
     /* returns an allocated reference array of the pooled objects */
-    public static GameObject[] InstantiatePoolAlloc<T> ( this GameObject prefab, Transform poolTransform, int poolSize, bool isActive = true ) 
+    public static GameObject[] InstantiatePoolAllocArr<T> ( this GameObject prefab, Transform poolTransform, int poolSize, bool isActive = true ) 
             where T : Object {
         GameObject[] alloc = new GameObject[poolSize];
         for (int i = 0; i < poolSize; i++) {

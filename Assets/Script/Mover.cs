@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
+using System.Collections;
 
-    /*
-    ===
-    ==
-        a mover is a gameobject that moves.
-        the follow scripts/components are its dependencies:
+/*
+===
+==
+    a mover is a gameobject that moves.
+    the follow scripts/components are its dependencies:
 
-            - MoveController.cs
-            - MoveQueue.cs
-    ==
-    ===
-    */
+        - MoveController.cs
+        - MoveQueue.cs
+==
+===
+*/
 
 public class Mover : MonoBehaviour {
 
@@ -30,17 +31,18 @@ public class Mover : MonoBehaviour {
             Debug.LogError ( "mover has no move queue!", gameObject );
         } else {
             QueuedMoves.CreateNewMoveQueuePool (10, gameObject.name);
-            QueuedMoves.LinkMoveNodes ();
             QueuedMoves.StartMoveNow += HandleOnStartMoveNow;
         }
     }
 
     void Update () {
         if ( QueuedMoves ) {
-            Debug.LogFormat("status of current move: {0}", currentMove==null);
+            if (currentMove != null) {
+                Debug.LogFormat("status of current move: {0}", currentMove.ID);
+            }
             if ( mouseClick_L && shouldMove == false ) {
                 targetPosition = MousePointer.Pos();
-                //currentMove = QueuedMoves.GetNextMove(targetPosition);
+                currentMove = QueuedMoves.GetNextMove(targetPosition);
             }
             if ( shouldMove && currentMove != null ) {
                 if ( mc.MoveUntilArrived ( moverTransform, currentMove.Position, MoveSpeed ) ) {
