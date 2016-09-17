@@ -16,7 +16,7 @@ public class MoveQueue : MonoBehaviour {
 
         public GameObject MoveMarkerObject      { get; set; }
         public GameObject QueuedMarkerObject    { get; set; }
-        public Transform  MoveMarkerTransform   { get { return MoveMarkerObject.transform; } } // need to add null checks for all of these
+        public Transform  MoveMarkerTransform   { get { return MoveMarkerObject.transform; } } // TODO: add null checks for all of these getters
         public Transform  QueuedMarkerTransform { get { return QueuedMarkerObject.transform; } }
         public Vector3    Position              { get { return MoveMarkerObject.transform.position; } }
         public Vector3    QueuedPosition        { get { return QueuedMarkerObject.transform.position; } }
@@ -27,16 +27,11 @@ public class MoveQueue : MonoBehaviour {
         public bool       IsQueueMarkerActive   { get { return QueuedMarkerObject.activeInHierarchy; } }
 
         public Move       Next                  { get; set; }
-        public Move       Previous              { get; set; } // do we need this??
+        //public Move       Previous              { get; set; } // do we need this??
 
-        public Move () {
-            QueuedMarkerObject.name = "queued_move_marker [id: " + ID + "]";
-            MoveMarkerObject = null;
-        }
-
-        public Move ( GameObject markerPrefab, bool isHeadNode, int id ) {
+        public Move ( GameObject markerPrefab, bool isMasterMoveNode, int id ) {
             ID = id;
-            IsMasterMoveNode = isHeadNode;
+            IsMasterMoveNode = isMasterMoveNode;
             if ( IsMasterMoveNode ) {
                 QueuedMarkerObject = null;
                 MoveMarkerObject = markerPrefab;
@@ -91,7 +86,7 @@ public class MoveQueue : MonoBehaviour {
     /* public properties */
     public MoveQueue.Move Head              { get; private set; }
     public MoveQueue.Move Tail              { get; private set; }
-    public MoveQueue.Move Sentinal          { get; private set; } // keep a ptr reference to the node of the most recent queued move, is null if not moving
+    public MoveQueue.Move Sentinal          { get; private set; } // keep a ptr reference to the node of the current queued move, is null if not moving
     public string         OwnerName         { get; private set; } // make it easy to id the associated mover of this pool in the hierarchy
     public int            PoolBufferMaxSize { get; private set; }
 
@@ -103,7 +98,17 @@ public class MoveQueue : MonoBehaviour {
     Transform          markerSubpoolActive   = null;
     Transform          markerSubpoolInactive = null;
     float              timeSinceLastClicked  = 0.0f;
-    bool               isExecutingMove       = false;
+
+    /* wrapper method for public access */
+    public void SignalMoveStart ( bool shouldStart ) {
+        Debug.LogFormat ( "signaled move start {0}", shouldStart );
+        StartCoroutine ( RaiseAfterSecondsFlagNewMoveEvent ( MoveDelay, shouldStart ) );
+    }
+
+    public void SignalMoveEnd ( MoveQueue.Move completedMoveNode, bool shouldEnd ) {
+        Debug.LogFormat ( "signaled move end with id of [{1}] {0}", shouldEnd, completedMoveNode.ID );
+        //completedMoveNode.
+    }
 
     public void CreateNewMoveQueuePool ( int poolBufferMaxSize, string ownerName = "move_queue: un-identified_owner", bool returnAllocation = false ) {
         OwnerName = ownerName;
@@ -117,29 +122,35 @@ public class MoveQueue : MonoBehaviour {
         }
     }
 
-    public MoveQueue.Move GetNextMove ( Vector3 targetPosition ) {
-        Debug.LogFormat("move requested: [last: {0}], [curr: {1}], [isExecuting {2}]", timeSinceLastClicked, Time.time, isExecutingMove);
-        if ( Time.time > timeSinceLastClicked ) { // should we treat this as a valid click?
+    public MoveQueue.Move GetNextMoveFromInput ( Vector3 targetPosition ) {
+        if ( Time.time > timeSinceLastClicked ) { // should we treat this call as a valid click?
             timeSinceLastClicked = setLastClickTime;
             if ( Head.IsMoveMarkerActive == true && Sentinal != null ) { // we're currently executing a move, so queue the current move
+                Debug.Log("queue a move");
                 MoveQueue.Move queuedMoveNode = Sentinal.Next;
                 queuedMoveNode.QueuedMarkerTransform.position = targetPosition;
                 queuedMoveNode.QueuedMarkerTransform.parent = markerSubpoolActive;
                 queuedMoveNode.QueuedMarkerTransform.SetAsLastSibling ();
                 queuedMoveNode.ToggleQueueMarkerVisibile ( true );
                 Sentinal = queuedMoveNode;
-            } else {
+                return null;
+            } else { // no moves queued, so return the current click as a move
+                Debug.Log("return a move");
                 Head.MoveMarkerTransform.position = targetPosition;
                 Head.ToggleMoveMarkerVisibile ( true );
-                Sentinal = Head.Next;
-                StartCoroutine ( RaiseAfterSecondsFlagNewMoveEvent ( MoveDelay ) );
+                Sentinal = Head.Next; // set the ptr to the first queue node
+                //StartCoroutine ( RaiseAfterSecondsFlagNewMoveEvent ( MoveDelay ) );
                 return Head;
             }
+        } else {
+            return null; // if we return here that means no inactive nodes to queue the requested move
         }
-        return null;
     }
 
     public MoveQueue.Move CheckForQueuedMove () {
+        if ( markerSubpoolActive.childCount > 0 ) { // any moves to exectue?
+            
+        }
         return null;
     }
 
@@ -148,28 +159,6 @@ public class MoveQueue : MonoBehaviour {
             markerPoolParent = MarkerPoolTransform;
             markerSubpoolActive = markerSubpoolActive.InstantiateTransformWithParent ( parent, "move_pool-active" );
             markerSubpoolInactive = markerSubpoolInactive.InstantiateTransformWithParent ( parent, "move_pool-inactive" );
-        }
-    }
-
-    /* a custom linked-list add() operation (original DEPRECATED version) */
-    void InitialisePooledObjectLinks ( GameObject markerPrefab, Transform parentTransform ) {
-        int i = 0;
-        while ( i < PoolBufferMaxSize ) {
-            MoveQueue.Move pooledQueuedMoveMarker = new MoveQueue.Move { // pair a gameobject with the move reference node
-                QueuedMarkerObject = markerPrefab.InstantiateAtPositionWithParent<GameObject> ( parentTransform, Vector3.zero, false ),
-                IsMasterMoveNode = false,
-                ID = i
-            };
-            if ( Head == null ) {
-                Head = pooledQueuedMoveMarker;
-                Head.Previous = null; // dno if i will need this but put it in for now
-                Tail = Head;
-            } else {
-                Tail.Next = pooledQueuedMoveMarker;
-                Tail.Previous = Tail; // dno if i will need this but put it in for now
-                Tail = Tail.Next;
-            }
-            i++;
         }
     }
 
@@ -182,12 +171,12 @@ public class MoveQueue : MonoBehaviour {
             if ( Head == null ) {
                 markerObject = moveMarker.InstantiateAtPositionWithParent<GameObject> ( parentTransform, Vector3.zero, false );
                 Head = new MoveQueue.Move ( markerObject, true, i );
-                Head.Previous = null; // dno if i will need this but put it in for now
+                //Head.Previous = null;
                 Tail = Head;
             } else {
                 markerObject = queuedMoveMarker.InstantiateAtPositionWithParent<GameObject> ( parentTransform, Vector3.zero, false );
                 Tail.Next = new MoveQueue.Move ( markerObject, false, i );
-                Tail.Previous = Tail; // dno if i will need this but put it in for now
+                //Tail.Previous = Tail;
                 Tail = Tail.Next;
             }
             i++;
@@ -199,6 +188,7 @@ public class MoveQueue : MonoBehaviour {
         return markerPoolParent == null && markerSubpoolActive == null && markerSubpoolInactive == null;
     }
 
+    /* the sentinal makes it so we don't need this method? */
     MoveQueue.Move GetNextInactive ( MoveQueue.Move node ) {
         MoveQueue.Move move = null;
         while ( node != null ) { // find an inactive node
@@ -211,11 +201,14 @@ public class MoveQueue : MonoBehaviour {
         return move;
     }
 
-    System.Collections.IEnumerator RaiseAfterSecondsFlagNewMoveEvent ( float delay ) {
+    /* notify the mover to start their move action */
+    System.Collections.IEnumerator RaiseAfterSecondsFlagNewMoveEvent ( float delay, bool signal ) {
+        Debug.LogFormat("signal recvd {0}", Time.time);
         yield return new WaitForSeconds ( delay );
-        isExecutingMove = true;
-        if (StartMoveNow != null) {
-            StartMoveNow(isExecutingMove);
+        Debug.LogFormat("delay time is 0 {0}", Time.time);
+        if ( StartMoveNow != null ) {
+            Debug.LogFormat("start move now {0}", Time.time);
+            StartMoveNow ( signal );
         }
     }
 }
