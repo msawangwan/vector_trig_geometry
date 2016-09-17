@@ -34,33 +34,29 @@ public class Mover : MonoBehaviour {
 
     void Update () {
         if ( QueuedMoves ) {
-            DEBUG_PrintClassLocalBools ();
             DEBUG_PrintCurrentMoveID ();
-            if ( shouldMove == false && currentMove == null ) {
-                Debug.Log("checking if any moves toexecute mover accepting input");
-                MoveQueue.Move move = QueuedMoves.CheckForQueuedMove();
-                if (move != null) {
-                    currentMove = move;
-                    QueuedMoves.SignalMoveStart ( true );
-                }
-            }
-            if ( mouseClick_L == true && shouldMove == false ) {
+            if ( mouseClick_L == true ) {
                 targetPosition = MousePointer.Pos();
                 MoveQueue.Move move = QueuedMoves.GetNextMoveFromInput ( targetPosition );
-                if (move != null) {
+                if ( move != null && shouldMove == false ) {
                     currentMove = move;
-                    QueuedMoves.SignalMoveStart ( true );
+                    QueuedMoves.OnSignalAfterSecondsStartMove ();
                 }
             }
             if ( shouldMove == true && currentMove != null ) {
+                Debug.LogFormat("executing move id# {0}", currentMove.ID);
                 if ( mc.MoveUntilArrived ( moverTransform, currentMove.Position, MoveSpeed ) == true ) {
-                    Debug.LogFormat("finished move with {0}", currentMove.ID);
-                    QueuedMoves.SignalMoveEnd ( currentMove, true );
-                    currentMove = null;
-                    shouldMove = false;
+                    Debug.LogFormat("finished move id# {0}", currentMove.ID);
+                    MoveQueue.Move move = QueuedMoves.OnMoveEndCheckForNext ( currentMove );
+                    if ( move != null ) {
+                        currentMove = move;
+                    } else {
+                        currentMove = null;
+                        shouldMove = false;
+                    }
                 }
                 if ( currentMove != null ) {
-                    Debug.LogFormat("rotating to move dest {0}", currentMove.ID);
+                    Debug.LogFormat("rotating to move dest id# {0}", currentMove.ID);
                     mc.RotateUntilFacingTarget ( moverTransform, currentMove.Position );
                 }
             }
@@ -69,12 +65,6 @@ public class Mover : MonoBehaviour {
 
     void HandleOnStartMoveNow (bool flag) {
         shouldMove = flag;
-        Debug.LogFormat("move flag changed event fired: {0}", Time.time);
-    }
-
-    void DEBUG_PrintClassLocalBools() {
-        Debug.LogFormat("should move is {0}", shouldMove);
-        Debug.LogFormat("current move is null {0}", currentMove == null);
     }
 
     void DEBUG_PrintCurrentMoveID ( MoveQueue.Move other = null ) {
