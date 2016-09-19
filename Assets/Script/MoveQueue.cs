@@ -14,14 +14,15 @@ public class MoveQueue : MonoBehaviour {
     /* data container class that serves as a linked-list or priority-queue node */
     public class Move {
 
+        public Move       Next              { get; set; }
+
         public GameObject MarkerObject     { get; set; }
         public Transform  MarkerTransform  { get { return MarkerObject.transform; } }
         public Vector3    Position         { get { return MarkerObject.transform.position; } }
 
-        public Move       Next              { get; set; }
-
         public int        ID               { get; set; }
         public bool       IsMasterMoveNode { get; set; }
+        public bool       IsCurrentMove    { get; set; }
         public bool       IsMarkerActive   { get { return MarkerObject.activeInHierarchy; } }
 
         public Move ( GameObject markerPrefab, bool isMasterMoveNode, int id ) {
@@ -33,6 +34,7 @@ public class MoveQueue : MonoBehaviour {
             } else {
                 MarkerObject.name = string.Format ( "[id: {0}] queued_move_marker", ID );
             }
+            IsCurrentMove = false;
         }
 
         public void ToggleMarkerVisibile ( bool shouldActivate ) {
@@ -66,12 +68,14 @@ public class MoveQueue : MonoBehaviour {
     public event System.Action<bool> StartMoveNow;
 
     /* public properties */
-    public MoveQueue.Move Head              { get; private set; }
-    public MoveQueue.Move Tail              { get; private set; }
-    public MoveQueue.Move SentinalActive    { get; private set; }
-    public MoveQueue.Move SentinalInactive  { get; private set; }
-    public string         OwnerName         { get; private set; } // make it easy to id the associated mover of this pool in the hierarchy
-    public int            PoolBufferMaxSize { get; private set; }
+    public MoveQueue.Move Head                 { get; private set; }
+    public MoveQueue.Move Tail                 { get; private set; }
+    public MoveQueue.Move SentinalActiveHead   { get; private set; }
+    public MoveQueue.Move SentinalInactiveHead { get; private set; }
+    public MoveQueue.Move SentinalActiveTail   { get; private set; }
+    public MoveQueue.Move SentinalInactiveTail { get; private set; }
+    public string         OwnerName            { get; private set; } // make it easy to id the associated mover of this pool in the hierarchy
+    public int            PoolBufferMaxSize    { get; private set; }
 
     /* local properties */
     float                 setLastClickTime  { get { return Time.time + RateLimitInterval; } }
@@ -96,52 +100,74 @@ public class MoveQueue : MonoBehaviour {
     }
 
     /* public wrapper method for calling the coroutine delay action */
-    public void OnSignalAfterSecondsStartMove () {
+    public void OnAfterSecondsSignalStartMove () {
         StartCoroutine ( RaiseAfterSecondsFlagNewMoveEvent ( MoveDelay, true ) );
     }
 
-    /* returns the next move in the queue, if any -- caller should always call on completing a move */
-    public MoveQueue.Move OnMoveEndCheckForNext ( MoveQueue.Move completedMoveNode ) {
-        completedMoveNode.ToggleMarkerVisibile ( false );
-        completedMoveNode.MarkerTransform.parent = markerSubpoolInactive;
-        completedMoveNode.MarkerTransform.position = Vector3.zero;
-        completedMoveNode.MarkerTransform.SetAsLastSibling ();
-        if ( completedMoveNode.Next != null ) {
-            if ( completedMoveNode.Next.IsMarkerActive == true ) {
-                SentinalActive = completedMoveNode.Next;
-                return SentinalActive;
+    /* returns a move or returns null if the move was queued instead */
+    public MoveQueue.Move HandleMoveRequest (Vector3 targetPosition) {
+        if (Time.time > timeSinceLastClicked) { // rate-limit input
+            timeSinceLastClicked = setLastClickTime;
+            if ( markerSubpoolInactive.childCount > 0 ) { // are there any move nodes available?
+                MoveQueue.Move firstInactiveMove = GetFirstInactiveMove();
+                if ( firstInactiveMove != null ) {
+                    MoveQueue.Move move = MoveToActivePool ( firstInactiveMove, targetPosition );
+                    if ( SentinalActiveHead == null ) {
+                        SentinalActiveHead = move;
+                        return move;
+                    }
+                }
             }
-        } else {
-            SentinalActive = null;
-            SentinalInactive = Head;
         }
         return null;
     }
 
-    /* returns a move or returns null if the move was queued instead */
-    public MoveQueue.Move GetNextMoveFromInput ( Vector3 targetPosition ) {
-        if ( Time.time > timeSinceLastClicked ) { // should we treat this call as a valid click?
-            timeSinceLastClicked = setLastClickTime;
-            if ( SentinalActive != null && SentinalInactive != null ) {
-                SentinalInactive.MarkerTransform.parent = markerSubpoolActive;
-                SentinalInactive.MarkerTransform.position = targetPosition;
-                SentinalInactive.MarkerTransform.SetAsLastSibling ();
-                SentinalInactive.ToggleMarkerVisibile ( true );
-                SentinalInactive = SentinalInactive.Next;
-                return null;
-            } else if ( Head.MarkerTransform.GetSiblingIndex () == 0 && SentinalActive != null ) {
-                // ????
-            } else if ( Head.MarkerTransform.GetSiblingIndex () == 0 && SentinalActive == null ) {
-                SentinalActive = Head;
-                SentinalActive.MarkerTransform.parent = markerSubpoolActive;
-                SentinalActive.MarkerTransform.position = targetPosition;
-                SentinalActive.MarkerTransform.SetAsFirstSibling ();
-                SentinalActive.ToggleMarkerVisibile ( true );
-                SentinalInactive = Head.Next; // set the ptr to the first queue node
-                return Head;
-            }
+    /* returns the next move in the queue, if any -- caller should always call on completing a move */
+    public MoveQueue.Move HandleMoveEnd ( MoveQueue.Move completedMoveNode ) {
+        MoveQueue.Move completedMove = MoveToInactivePool ( completedMoveNode );
+        SentinalInactiveTail = completedMove;
+        SentinalActiveHead = completedMove.Next;
+        if (SentinalActiveHead != null) {
+            return SentinalActiveHead;
         }
+        Debug.Log("return null");
         return null;
+    }
+
+    MoveQueue.Move GetFirstActiveMove () {
+        if (SentinalActiveHead == null) { // no moves to pop
+            return null;
+        } else {
+            MoveQueue.Move currMove = SentinalActiveHead;
+            SentinalActiveHead = SentinalActiveHead.Next;
+            return currMove;
+        }
+    }
+
+    MoveQueue.Move GetFirstInactiveMove () {
+        if (SentinalInactiveHead == null) { // no moves to queue
+            return null;
+        } else {
+            MoveQueue.Move queuedMove = SentinalInactiveHead;
+            SentinalInactiveHead = SentinalInactiveHead.Next;
+            return queuedMove;
+        }
+    }
+
+    MoveQueue.Move MoveToActivePool (MoveQueue.Move move, Vector3 position) {
+        move.MarkerTransform.parent = markerSubpoolActive;
+        move.MarkerTransform.position = position;
+        move.MarkerTransform.SetAsLastSibling ();
+        move.ToggleMarkerVisibile ( true );
+        return move;
+    }
+
+    MoveQueue.Move MoveToInactivePool (MoveQueue.Move move) {
+        move.ToggleMarkerVisibile ( false );
+        move.MarkerTransform.parent = markerSubpoolInactive;
+        move.MarkerTransform.position = Vector3.zero;
+        move.MarkerTransform.SetAsLastSibling ();
+        return move;
     }
 
     /* instantiate the transforms for active and inactive pooled objects */
@@ -169,8 +195,11 @@ public class MoveQueue : MonoBehaviour {
             }
             i++;
         }
-        SentinalInactive = Head;
-        SentinalActive = null;
+        Tail.Next = Head;
+        SentinalInactiveTail = Tail;
+        SentinalInactiveHead = Head;
+        SentinalActiveTail = null;
+        SentinalActiveHead = null;
     }
 
     /* returns true if all the container pool transforms are null, false otherwise */
